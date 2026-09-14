@@ -75,8 +75,8 @@ $web-font-path: "https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@
   }
 }
 
-// Keep MathJax expressions at the surrounding text size.
+// Visually balance MathJax expressions with the surrounding text.
 // Override the inline scale chosen by the CommonHTML renderer.
 mjx-container[jax="CHTML"] {
-  font-size: 100% !important;
+  font-size: 90% !important;
 }
