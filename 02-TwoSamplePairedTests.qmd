@@ -290,7 +290,7 @@ Notez également que **la moyenne des différences** n'est pas équivalente à *
 :::
 
 
-### Conditions d'application
+### Conditions d'application {#sec-paired-conditions}
 
 Les conditions d'application de ce test paramétrique sont presque les mêmes que pour le test de Student à un échantillon :
 

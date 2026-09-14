@@ -29,6 +29,8 @@ list.of.packages <- c(
   "mixdist",
   "scales",
   "marked",
+  "binom",
+  "janitor",
   "popbio"
 )
 new.packages <- list.of.packages[
@@ -91,6 +93,8 @@ knitr::write_bib(
     "mixdist",
     "nycflights13",
     "marked",
+    "binom",
+    "janitor",
     "popbio"
   ),
   'packages.bib'
@@ -104,9 +108,9 @@ system("cat book.bib packages.bib > all.bib")
 
 ## Objectifs {-}
 
-Ce livre contient l'ensemble du matériel (contenus, exemples, exercices...) nécessaire à la réalisation des travaux pratiques de **Biométrie** de l'EC *Outils pour l'étude et la compréhension du vivant 4* du semestre 5 de la licence Sciences de la Vie de La Rochelle Université.
+Ce livre rassemble les contenus, exemples et exercices des travaux pratiques qui illustrent les cours magistraux (CM) et les travaux dirigés (TD) de **Biométrie**, dans l'EC *Outils pour l'étude et la compréhension du vivant 4* du semestre 5 de la licence Sciences de la Vie de La Rochelle Université. Ces travaux pratiques sont assurés par **Benoît Simon-Bouhet**. Les cinq chapitres de cet ouvrage sont consacrés aux tests statistiques de comparaison de moyennes et de proportions, aux tests de qualité de l'ajustement, ainsi qu'à la démarche d'analyse des données à mettre en place avant leur utilisation.
 
-À la fin du semestre, vous devriez être capables de faire les choses suivantes dans `RStudio` :
+À l'issue du travail sur les cinq chapitres de ce livre, vous devriez être capables de faire les choses suivantes dans `RStudio` :
 
 - Mettre en forme des tableaux de données : renommer des variables, en créer de nouvelles, modifier des variables existantes, filtrer des lignes, sélectionner des colonnes, etc. (vu au semestre 3)
 - Explorer des jeux de données en produisant des graphiques appropriés selon la nature des variables disponibles, leur nombre et l'objectif recherché (vu au semestre 3)
@@ -115,11 +119,14 @@ Ce livre contient l'ensemble du matériel (contenus, exemples, exercices...) né
 - Choisir et formuler des hypothèses adaptées à la question scientifique posée (hypothèses bilatérales ou unilatérales)
 - Choisir les tests statistiques permettant de répondre à une question scientifique précise selon la nature de la question posée et la nature des variables à disposition
 - Réaliser les tests usuels de comparaison de moyennes ($t$ de Student à 1 ou 2 échantillons, appariés ou indépendants...)
-- Vérifier les conditions d'application des tests (graphiquement et avec des tests appropriés tels que les tests de Shapiro-Wilk et de Levene), et le cas échéant, réaliser des tests non paramétriques équivalents (test de Welch, de Wilcoxon...)
+- Vérifier les conditions d'application des tests (graphiquement et avec des tests appropriés tels que les tests de Shapiro-Wilk et de Levene), et le cas échéant, choisir une alternative adaptée (test de Welch, de Wilcoxon...)
+- Estimer une proportion et son intervalle de confiance
+- Comparer une proportion à une valeur théorique et comparer les proportions de deux groupes indépendants
+- Construire et interpréter une table de contingence, examiner les effectifs attendus et choisir un test adapté
+- Comparer une distribution d'effectifs observés à une distribution attendue sous un modèle théorique, avec un test du $\chi^2$ de qualité de l'ajustement
+- Distinguer un test du $\chi^2$ d'indépendance d'un test du $\chi^2$ de qualité de l'ajustement
 - Interpréter correctement les résultats des tests pour répondre aux questions scientifiques posées
-- Identifier des cohortes dans une population et en étudier les caractéristiques et l'évolution temporelle
-- Simuler le comportement de populations théoriques simples suivant des modèles démographiques précis (mortalité exponentielle, croissance exponentielle, croissance logistique, système prédateur-proies de Lotka et Volterra, et systèmes de compétition à 2 ou 3 espèces...)
-- Simuler, par chaînes de Markov, les successions écologiques dans un écosystème théorique
+
 
 
 ## Pré-requis {-}
@@ -149,33 +156,35 @@ Vous aurez de toutes façons besoin de vous référer à ces 2 documents réguli
 
 ### Volume de travail {-}
 
-Les travaux pratiques de biométrie auront lieu entre le 14 septembre et le 09 décembre 2026. Durant cette période, vous n'aurez jamais plus d'un créneau d'1h30 de TP (pour chaque groupe) par semaine, et deux séances consécutives sont souvent espacées de deux semaines ou plus. Vous devrez donc prendre l'habitude de prévoir, dans vos emplois du temps, des plages de travail personnel régulières, afin de ne pas oublier tout ce que vous avez appris entre deux séances de TP. 
+Les travaux pratiques de biométrie auront lieu entre le 14 septembre et le 9 décembre 2026. Durant cette période, vous n'aurez jamais plus d'un créneau d'1h30 de TP par semaine pour chaque groupe, et deux séances consécutives sont souvent espacées de deux semaines ou plus. Vous devrez donc prendre l'habitude de prévoir, dans vos emplois du temps, des plages de travail personnel régulières afin de ne pas oublier ce que vous avez appris entre deux séances de TP.
 
 **Les séances de TP ont lieu soit en salle MSI 217, soit dans les salles du Pôle Communication Multimédia Réseau (PCMR), dans les salles Sc1 à Sc7 ou en salle Info Trans.**
 
-Au total, chaque groupe aura 9 séances de TP, soit un total de 13,5 heures prévues dans vos emplois du temps. C'est peu pour atteindre les objectifs fixés et il y aura donc évidemment du travail personnel à fournir en dehors de ces séances. Comme indiqué ci-dessus, vous devrez prévoir du temps, et vos prédécesseurs consacraient en moyenne entre une et trois heures de travail personnel pour chaque séance de TP prévue dans leur emploi du temps. Comme pour les semestres précédents, Ce travail personnel et régulier est essentiel pour progresser dans cette matière. J'insiste sur l'importance de faire l'effort dès maintenant : vous allez en effet avoir des enseignements qui reposent sur l'utilisation de ces logiciels jusqu'à la fin du S6 (y compris pendant vos stages et, très vraisemblablement, dans vos futurs masters également). C'est donc maintenant qu'il faut acquérir des automatismes, cela vous fera gagner énormément de temps ensuite. 
+Au total, chaque groupe aura 9 séances de TP de 1h30 au semestre 5. **Cinq de ces séances, soit 7h30, seront assurées par mes soins (Benoît Simon-Bouhet) et porteront sur les contenus de ce livre.** Les quatre autres séances seront assurées par Florian Orgeret et pour lesquelles un autre livre en ligne sera disponible. Pour atteindre les objectifs présentés ici, vous devrez prévoir du travail personnel régulier entre les 5 séances de TP décrites ici. Vos prédécesseurs consacraient en moyenne entre une et trois heures de travail personnel pour chaque séance de TP prévue dans leur emploi du temps. Comme pour les semestres précédents, Ce travail personnel et régulier est essentiel pour progresser dans cette matière. J'insiste sur l'importance de faire l'effort dès maintenant : vous allez en effet avoir des enseignements qui reposent sur l'utilisation de ces logiciels jusqu'à la fin du S6 (y compris pendant vos stages et, très vraisemblablement, dans vos futurs masters également). C'est donc maintenant qu'il faut acquérir des automatismes, cela vous fera gagner énormément de temps ensuite. 
 
-Ces 9 séances de travaux pratiques seront assurées par 2 intervenants : Benoît Simon-Bouhet et Florian Orgeret. La particularité de ces TP de biométrie du semestre 5, c'est qu'ils contiennent deux parties presque indépendantes. Les chapitres 1, 2, et 3 illustrent les cours et les TD de Biométrie. Ils seront assurés par Benoit Simon-Bouhet. Les chapitres 4, 5, 6 et 7 illustrent les cours de Fonctionnement des écosystèmes. Ils seront assurés par Florian Orgeret. Ces deux blocs étant relativement indépendants, ils auront lieu en parallèle sur le semestre. Vous pourrez donc avoir, en alternance, des séances avec ces deux intervenants, mais elles ne sont pas interchangeables, car leurs modalités pédagogiques ne sont pas interchangeables (voir plus bas). Vous devrez donc vérifier sur vos emplois du temps quel intervenant assure chaque séance de TP.
+**Attention, mes séances et celles de Florian Orgeret sont intercalées au cours du semestre.** Pour les TP de l'EC outils, deux séances consécutives dans votre emploi du temps ne correspondent donc pas nécessairement au même intervenant ni au même travail à préparer. Avant chaque TP, vérifiez le nom de l'intervenant, la salle et les consignes de préparation associées à la séance.
 
 :::{.callout-warning}
-# Important
+## Important
 
-Soyez vigilant : les deux intervenants ne traitent pas les mêmes chapitres, et les modalités pédagogiques qu'ils utilisent ne sont pas les mêmes. Assurez-vous donc que vous avez préparé/travaillé les bons chapitres aux bons moments.
+Soyez vigilants lorsque vous consultez vos emplois du temps : les deux intervenants utilisent des supports et des modalités pédagogiques différents. Les consignes de ce livre concernent uniquement mes séances. Pour celles de Florian Orgeret, consultez les documents et les consignes qu'il vous fournit.
 :::
+
+
 
 ### Modalités d'enseignement {-}
 
 Pour suivre cet enseignement, vous pourrez utiliser les ordinateurs de l'université, mais je ne peux que vous encourager à utiliser vos propres ordinateurs, sous Windows, Linux ou MacOS. Lors de vos futurs stages et pour rédiger vos comptes rendus de TP, vous utiliserez le plus souvent vos propres ordinateurs, autant prendre dès maintenant de bonnes habitudes en installant les logiciels dont vous aurez besoin tout au long de votre licence. Si vous n'avez pas suivi les cours de biométrie de L2 et que les logiciels `R` et `RStudio` ne sont pas encore installés sur vos ordinateurs, suivez [la procédure décrite ici](https://besibo.github.io/BiometrieS3/01-R-basics.html#sec-install). Si vous ne possédez pas d'ordinateur, manifestez-vous rapidement auprès de moi car des solutions existent (prêt par l'université, travail sur tablette ou chromebook via [Posit cloud](https://posit.cloud)...).
 
-:::{.callout-important}
-# Séances assurées par Benoît Simon-Bouhet
 
-L'essentiel du contenu de cet enseignement peut être abordé en autonomie, à distance, grâce à ce livre en ligne, aux ressources mises à disposition sur Moodle et à votre ordinateur personnel. Cela signifie que **la présence physique lors des TP n'est pas obligatoire pour toutes les séances**. 
+:::{.callout-important}
+## Séances assurées par Benoît Simon-Bouhet
+
+L'essentiel du contenu de ce livre peut être abordé en autonomie, à distance, grâce aux explications et exercices proposés ici, aux ressources mises à disposition sur Moodle et à votre ordinateur personnel. **Les cinq séances que j'assure fonctionnent comme des permanences d'accompagnement : votre présence en salle est facultative, mais le travail demandé est obligatoire.**
 :::
 
-Plus que des séances de TP classiques, considérez plutôt qu'il s'agit de **permanences non-obligatoires** : si vous pensez avoir besoin d'aide, si vous avez des points de blocage ou des questions sur le contenu de ce document ou sur les exercices demandés, alors venez poser vos questions lors des séances de TP. Vous ne serez d'ailleurs pas tenus de rester pendant 1h30 : si vous obtenez une réponse en 10 minutes et que vous préférez travailler ailleurs, vous serez libres de repartir ! 
 
-De même, si vous n'avez pas de difficulté de compréhension, que vous n'avez pas de problème avec les exercices de ce livre en ligne ni avec les quiz Moodle, votre présence n'est pas requise. Si vous souhaitez malgré tout venir en salle de TP, pas de problème, vous y serez toujours les bienvenus.
+Plus que des séances de TP classiques, considérez plutôt qu'il s'agit de **permanences non-obligatoires** : si vous pensez avoir besoin d'aide, si vous avez des points de blocage ou des questions sur le contenu de ce document ou sur les exercices demandés, alors venez poser vos questions lors des séances de TP. Vous ne serez d'ailleurs pas tenus de rester pendant 1h30 : si vous obtenez une réponse en 10 minutes et que vous préférez travailler ailleurs, vous serez libres de repartir. De même, si vous n'avez pas de difficulté de compréhension, que vous n'avez pas de problème avec les exercices de ce livre en ligne ni avec les quiz Moodle, votre présence n'est pas requise. Si vous souhaitez malgré tout venir en salle de TP, pas de problème, vous y serez toujours les bienvenus.
 
 Ce fonctionnement très souple a de nombreux avantages :
 
@@ -185,18 +194,15 @@ Ce fonctionnement très souple a de nombreux avantages :
 - vous travaillez sur vos ordinateurs
 - les effectifs étant réduits, c'est aussi plus confortable pour moi !
 
-Toutefois, pour que cette organisation fonctionne, cela demande de la rigueur de votre part, en particulier sur la régularité du travail que vous devez fournir. Si la présence en salle de TP n'est pas requise, **le travail demandé est bel et bien obligatoire** ! Si vous venez en salle de TP sans avoir travaillé en amont, votre venue sera totalement inutile puisque vous n'aurez pas de question à poser et que vous passerez votre séance à lire et suivre ce livre en ligne, choses que vous pouvez très bien faire chez vous. Vous perdrez donc votre temps, celui de vos collègues, et le mien. De même, si vous attendez la 4e semaine pour vous y mettre, vous irez droit dans le mur. Je le répète, outre les heures de TP/TEA prévues dans vos emplois du temps, vous devez prévoir au moins 20 heures de travail personnel supplémentaire.
+Toutefois, pour que cette organisation fonctionne, cela demande de la rigueur de votre part, en particulier sur la régularité du travail que vous devez fournir. Si la présence en salle de TP n'est pas requise, **le travail demandé est bel et bien obligatoire** ! Si vous venez en salle de TP sans avoir travaillé en amont, vous ne tirerez pas grand-chose des séances puisque vous passerez votre temps à lire et suivre ce livre en ligne, choses que vous pouvez très bien faire chez vous. Votre temps, celui de vos collègues et le mien sera bien mieux utilisé si vous avez travaillé en amont des séances. Aussi, n'attendez pas plusieurs semaines pour commencer : prévoyez des plages régulières de travail personnel dès le début du semestre, y compris les semaines où aucune séance n'est programmée avec moi.
 
-Je vous laisse donc une grande liberté d'organisation. À vous d'en tirer le maximum et de faire preuve du sérieux nécessaire. Le rythme auquel vous devriez avancer est présenté dans la partie suivante intitulée "Progression conseillée".
+Je vous laisse donc une grande liberté d'organisation. À vous d'en tirer le maximum et de faire preuve du sérieux nécessaire. Le rythme auquel vous devriez avancer est présenté dans la partie suivante "Progression conseillée" ci-dessous.
 
 :::{.callout-important}
-# Séances assurées par Florian Orgeret : attention ! 
+## Séances assurées par Florian Orgeret : attention !
 
-Le mode "permanence non obligatoire" n'est valable que pour les 5 séances de TP de Benoît Simon-Bouhet, qui portent sur les tests de comparaison de moyennes. Pour les 4 séances de Florian Orgeret, qui portent sur le cours de fonctionnement des écosystèmes, votre présence physique est requise en salle informatique. Leur contenu étant plus éloigné de ce que vous avez déjà vu dans vos précédents enseignements de biométrie, votre présence en salle de TP est donc **obligatoire**, comme pour un TP classique.
-
-Pensez donc bien à vérifier quel intervenant doit assurer votre prochain TP afin de ne pas commettre d'impair !
+**Le fonctionnement en permanence facultative concerne uniquement mes séances. La présence aux séances de Florian Orgeret est obligatoire, sauf indications contraires de sa part.** Ces séances étant intercalées dans vos emplois du temps, vérifiez systématiquement quel intervenant assure votre prochain TP et préparez le travail correspondant.
 :::
-
 
 <!-- ### Utilisation de Slack {-}
 
@@ -212,34 +218,55 @@ Ainsi, quand vous travaillerez à vos TP ou TEA, que vous soyez installés chez 
 
 ### Comment communiquer
 
-Lors de vos séances de travail, en cas de question, merci de nous contacter directement par email. Vous pouvez joindre des copies de votre code et de vos éventuels messages d'erreurs, ainsi que des copies d'écran si besoin.
+Lors de votre travail sur les chapitres et exercices de ce livre, vous pouvez me contacter directement par email. Joignez, si nécessaire, votre code, les messages d'erreur obtenus et des captures d'écran permettant de comprendre votre difficulté.
 
-Sachez toutefois qu'afin d'éviter de recevoir les mêmes questions de nombreuses fois, nos réponses pourront être adressées à l'ensemble de la promotion. Ainsi, tout le monde en profite, et tout le monde progresse en même temps.
+Sachez toutefois qu'afin d'éviter de recevoir les mêmes questions de nombreuses fois, mes réponses pourront être adressées à l'ensemble de la promotion. Ainsi, tout le monde en profite, et tout le monde progresse en même temps.
 
-Ce document est fait pour vous permettre d'avancer en autonomie et vous ne devriez normalement pas avoir beaucoup besoin de nous si votre lecture est attentive. L'expérience montre en effet que la plupart du temps, il suffit de lire correctement les paragraphes précédents et/ou suivants pour obtenir la réponse à ses questions. Lors des séances de TP au format "permanence", j'essaie de rester disponible par mail, mais je réponds évidemment en priorité à celles et ceux qui seront physiquement présents en salle. Cela signifie néanmoins que **même si votre groupe n'est pas en TP, vos questions ont des chances d'être lues et de recevoir des réponses dès que d'autres groupes sont en TP**. Vous pouvez d'ailleurs vous-même envoyer vos questions directement à toute la promotion : vous aurez ainsi plus de chances que quelqu'un vous réponde rapidement.
+Ce document est fait pour vous permettre d'avancer en autonomie et vous ne devriez normalement pas avoir beaucoup besoin de moi si votre lecture est attentive. L'expérience montre en effet que la plupart du temps, il suffit de lire correctement les paragraphes précédents et/ou suivants pour obtenir la réponse à ses questions. Lors des séances de TP au format "permanence", j'essaie de rester disponible par mail, mais je réponds évidemment en priorité à celles et ceux qui sont physiquement présents en salle. Cela signifie néanmoins que **même si votre groupe n'est pas en TP, vos questions ont des chances d'être lues et de recevoir des réponses lorsque j'assure une permanence pour un autre groupe**. Vous pouvez d'ailleurs vous-même envoyer vos questions directement à toute la promotion : vous aurez ainsi plus de chances que quelqu'un vous réponde rapidement.
+
 
 
 ## Progression conseillée {-}
 
 Si vous avez suivi le document de prise en main de `R` et `RStudio` lors de l'EC de biométrie du semestre 3 de la licence SV de La Rochelle, vous savez que pour apprendre à utiliser ces logiciels, il faut faire les choses soi-même, ne pas avoir peur des messages d'erreurs (il faut d'ailleurs apprendre à les déchiffrer pour comprendre d'où viennent les problèmes), essayer maintes fois, se tromper beaucoup, recommencer, et surtout, ne pas se décourager. J'utilise ce logiciel presque quotidiennement depuis près de 20 ans et à chaque session de travail, je rencontre des messages d'erreur. Avec suffisamment d'habitude, on apprend à les déchiffrer et on corrige les problèmes en quelques secondes. Ce livre est conçu pour vous faciliter la tâche, mais ne vous y trompez pas, vous rencontrerez des difficultés, et c'est normal. C'est le prix à payer pour profiter de la puissance du meilleur logiciel permettant d'analyser des données, de produire des graphiques de qualité et de réaliser toutes les statistiques dont vous aurez besoin d'ici la fin de vos études et au-delà.
 
-Pour que cet apprentissage soit le moins problématique possible, il convient de prendre les choses dans l'ordre. C'est la raison pour laquelle les chapitres 1, 2 et 3 d'une part, et 4, 5, 6 et 7 d'autre part, doivent être lus dans l'ordre, et les exercices d'application faits au fur et à mesure de la lecture.
+Pour que cet apprentissage soit le moins problématique possible, prenez les choses dans l'ordre : lisez successivement les chapitres 1 à 5 et faites les exercices d'application au fur et à mesure de votre lecture.
 
-Idéalement, voilà les étapes que vous devriez avoir franchies chaque semaine :
+:::{.callout-important}
+## Comment lire cette progression
 
-1. Les deux premières séances sont consacrées à la comparaison de la moyenne d'une population à une valeur théorique (@sec-moy1). Si vous êtes déjà capable d'importer et manipuler des données dans `R`, ainsi que de les explorer graphiquement et par le calcul d'indices de statistiques descriptives (indices de position, de dispersion et d'incertitude), les fonctions nouvelles seront peu nombreuses. Mais ce chapitre est l'occasion d'aborder des notions complexes (test paramétrique ou non, hypothèses nulles et alternatives, $p-$value, décision, erreurs, puissance, etc.) qui demanderont une lecture très attentive. C'est également la première fois que vous serez confronté à toutes les étapes d'une analyse de données : de l'importation des données dans `RStudio` jusqu'à la réalisation des tests statistiques et leur interprétation, en passant par le calcul des statistiques descriptives appropriées, la réalisation de graphiques exploratoires pertinents, et la vérification des conditions d'application du test. La maîtrise du logiciel n'est donc ici qu'une petite partie de ce qui est demandé : maîtriser les notions et concepts, comprendre la démarche d'analyse, être capable de l'expliquer et de la reproduire, est ici crucial. Évidemment, si vous ne disposez pas des bases essentielles à la compréhension des commandes de ce chapitre, vous devrez trouver le temps de (re)lire les livres en ligne [du semestre 3](https://besibo.github.io/BiometrieS3/) et [du semestre 4](https://besibo.github.io/BiometrieS4/). Avant votre troisième séance de TP, vous devriez ainsi avoir atteint la fin du chapitre 1, et vous devriez avoir terminé l'exercice d'application de la section @sec-exo1.
+**La progression ci-dessous concerne uniquement les cinq séances que j'assure, à raison d'une séance par chapitre.** La "troisième séance", par exemple, désigne votre troisième séance avec moi, même si vous avez entre-temps suivi des séances avec Florian Orgeret. Vérifiez donc le nom de l'intervenant dans votre emploi du temps pour identifier la séance et le chapitre correspondants.
+:::
 
-2. Les deux séances suivantes sont consacrées à la comparaison de la moyenne de 2 populations, dans deux situations : lorsque les données des deux groupes sont appariées (@sec-moy2) et quand elles sont indépendantes (@sec-moy3). Ces chapitres seront également l'occasion d'aborder la notion de test unilatéral et bilatéral et d'apprendre comment coder des hypothèses alternatives spécifiques dans `RStudio`. Comme pour les semaines précédentes, vous aurez l'occasion de mettre en œuvre la totalité de la démarche d'analyse statistique, et dans chaque chapitre, un ou deux exercices d'application vous sont également proposés. 
+### Séance 1 — Comparer une moyenne à une valeur théorique {-}
 
-Avant votre cinquième séance de TP, vous devriez donc être capable de choisir la procédure adaptée afin de comparer la moyenne d'une population à une valeur théorique, ou de comparer la moyenne de 2 populations, dans le cas où vous disposez d'échantillons appariés et dans le cas où les échantillons sont indépendants. Dans toutes ces situations, vous devrez être capable de vérifier les conditions d'application des tests paramétriques, et de choisir des tests non-paramétriques équivalents si les conditions d'application ne sont pas vérifiées. Vous devrez évidemment aussi être capables d'interpréter les résultats de ces tests. Et bien sûr, avant de faire chaque type de test, vous devrez aussi toujours penser au préalable à examiner les données graphiquement (à l'aide de graphiques adaptés), et par le biais des statistiques descriptives décrites au semestre 4 et rappelées plus haut (indices de position, de dispersion et d'incertitude).
+La première séance est consacrée au chapitre @sec-moy1. À partir de l'exemple des températures corporelles, vous devrez mettre en œuvre toutes les étapes d'une analyse de données : importer et mettre en forme les données, les examiner à l'aide de statistiques descriptives (@sec-eda) et de graphiques adaptés (@sec-edagraph), vérifier les conditions d'application du test (@sec-norm), puis réaliser le test de Student à un échantillon ou son alternative non paramétrique de Wilcoxon.
 
-C'est moi (Benoît Simon-Bouhet) qui assurerai ces 4 séances de TP. Les 3 séances suivantes, assurées par Florian Orgeret, sont consacrées à la mise en pratique des notions vues dans le cours magistral de Population Dynamics (EC "Fonctionnement des Écosystèmes").
+L'objectif est de comprendre la démarche autant que de maîtriser les commandes de `RStudio`. Vous devrez être capables de formuler les hypothèses, d'interpréter la $p$-value et de rédiger une conclusion répondant à la question posée. Vous devrez également distinguer l'estimation et son incertitude du résultat d'un test, et comprendre les notions d'erreurs de type I et II et de puissance statistique (@sec-puiss). L'exercice d'application (@sec-exo1) vous permettra de reproduire cette démarche sur un nouveau jeu de données.
 
-3. La cinquième séance est consacrée à l'analyse de cohortes (@sec-cohortes). Avant votre sixième séance de TP, vous devriez être en mesure de réaliser l'analyse de cohorte d'une population étudiée pendant plusieurs années afin de produire les courbes de croissance, de survie et d'Allen d'une cohorte d'intérêt. Vous devrez en particulier importer et mettre en forme des données issues d'un suivi de terrain, produire les structures démographiques instantanées à chaque date d'échantillonnage, faire les décompositions polymodales afin de récupérer les informations utiles au sujet de la cohorte dont on souhaite assurer le suivi et enfin, produire, pour cette cohorte, les courbes de croissance, de mortalité et d'Allen.
+### Séance 2 — Comparer des données appariées {-}
 
-4. La sixième séance est consacrée à l'étude des systèmes dynamiques (@sec-dynam). Vous devrez coder différents modèles d'évolution d'une population (mortalité exponentielle, croissance exponentielle, croissance logistique) ou de plusieurs populations ou espèces (modèle prédateurs-proies, modèle de compétition). Ces modèles généreront des données que vous devrez représenter graphiquement. Vous devrez enfin modifier la valeur de certains paramètres de ces modèles pour comprendre leur influence sur le comportement des systèmes dynamiques étudiés. Pour la première fois, vous utiliserez donc `RStudio` pour produire des données qui suivent un modèle que vous spécifierez, au lieu d'importer des données déjà disponibles. L'objectif est ici de vous montrer comment utiliser le logiciel pour étudier le comportement de modèles théoriques de dynamique des populations, et de vous permettre d'évaluer l'importance et la sensibilité des conditions initiales et des valeurs des paramètres des modèles.
+La deuxième séance est consacrée au chapitre @sec-moy2. À partir de l'exemple sur la testostérone et l'immunocompétence, vous apprendrez à reconnaître des observations appariées, à organiser les données aux formats large et long et à représenter graphiquement le lien entre les deux mesures réalisées sur chaque individu.
 
-5. La septième et dernière séance est consacrée à l'utilisation des chaînes de Markov dans un contexte d'écologie des communautés (@sec-markov). Vous verrez comment utiliser `RStudio` pour coder une chaîne de Markov permettant d'étudier les successions écologiques et l'atteinte de l'état d'équilibre d'un écosystème abritant plusieurs communautés végétales. Comme pour la semaine précédente, vous devrez coder le système, représenter graphiquement les résultats de simulation, et examiner les conséquences de changements des conditions initiales ou des probabilités de transitions entre communautés. Comme toujours, l'objectif est donc double : vous permettre de découvrir de nouvelles possibilités d'analyses réalisables avec `R` et `RStudio`, et vous permettre de mieux comprendre les notions fondamentales abordées dans les cours magistraux.
+Vous devrez comprendre pourquoi l'analyse porte sur les différences individuelles et pourquoi la condition de normalité doit être vérifiée sur ces différences (@sec-paired-conditions). Vous réaliserez le test de Student sur données appariées et étudierez son alternative non paramétrique. Vous devrez être capables d'interpréter les résultats en tenant compte du sens dans lequel les différences sont calculées, puis d'appliquer cette démarche à la comparaison des températures du corps et du cerveau des autruches.
+
+### Séance 3 — Comparer deux échantillons indépendants {-}
+
+La troisième séance est consacrée au chapitre @sec-moy3. À partir de l'exemple des lézards cornus, vous devrez comparer deux groupes indépendants, en examinant séparément les données de chaque groupe et en estimant les moyennes et leur incertitude.
+
+Vous apprendrez à vérifier les conditions d'application des tests et à comprendre leur robustesse (@sec-robust), puis à choisir entre le test de Student, le test de Welch et le test de Wilcoxon sur la somme des rangs. Vous devrez interpréter le résultat du test et la différence entre les groupes à l'aide des estimations et des intervalles de confiance. Cette séance permettra également de distinguer tests bilatéraux et unilatéraux (@sec-bilat), de justifier le choix d'une hypothèse unilatérale et de comprendre le rôle de l'ordre des groupes dans la syntaxe du test.
+
+### Séance 4 — Estimer et comparer des proportions {-}
+
+La quatrième séance est consacrée au chapitre @sec-prop. À partir des données sur les calmars, vous devrez passer des observations individuelles aux effectifs et aux proportions, comprendre en quoi une proportion est une moyenne et estimer son incertitude à l'aide d'un intervalle de confiance.
+
+Vous apprendrez à comparer une proportion à une valeur théorique avec le test binomial exact (@sec-prop-one), puis à comparer les proportions de deux groupes indépendants (@sec-prop-two). Vous devrez également construire et interpréter une table de contingence, faire le lien entre comparaison de proportions et test du $\chi^2$ d'indépendance, examiner les effectifs attendus et comprendre dans quelles situations utiliser le test exact de Fisher (@sec-prop-fisher). L'objectif est de savoir choisir le test adapté et de rédiger une conclusion fondée sur les proportions estimées, leur incertitude et les résultats du test.
+
+### Séance 5 — Tester la qualité de l'ajustement {-}
+
+La cinquième et dernière séance est consacrée au chapitre @sec-goodness-fit. Vous étendrez la démarche de comparaison de proportions à une distribution entière d'effectifs. À partir de l'exemple des poissons récifaux et des phases lunaires, vous devrez définir un modèle proportionnel (@sec-gof-proportional), calculer les probabilités et les effectifs attendus sous l'hypothèse nulle, puis réaliser un test du $\chi^2$ de qualité de l'ajustement (@sec-gof-test).
+
+Vous apprendrez à examiner les conditions d'application, les contributions des différentes catégories au $\chi^2$ et la magnitude des écarts observés. Vous étudierez également l'ajustement à une loi binomiale (@sec-gof-binomial) et à une loi de Poisson (@sec-gof-poisson), ainsi que la prise en compte des paramètres estimés dans le calcul des degrés de liberté (@imp-gof-df). Vous devrez être capables de distinguer un test de qualité de l'ajustement d'un test d'indépendance et de formuler une conclusion qui porte précisément sur le modèle théorique testé.
 
 
 ## Quelques mots sur les IA génératives
@@ -263,13 +290,9 @@ Bref, ces outils sont puissants, ils sont parfois très utiles (et ils vont cont
 
 ## Évaluation(s) {-}
 
-L'évaluation de la partie "Biométrie" de l'EC "Outils pour l'étude et la compréhension du vivant" aura lieu dans le cadre du travail de stratégie d'échantillonnage que vous mettez en œuvre avec Pierrick Bocher. Une évaluation **formative** servira à évaluer 3 choses : 
+L'évaluation de la partie "Biométrie" de l'EC "Outils pour l'étude et la compréhension du vivant" aura lieu sous la forme d'un examen terminal sur table. Puisque vous n'aurez pas accès à votre ordinateur, je ne vous demanderai pas d'écrire des lignes de codes. Toutefois, cette évaluation portera sur l'ensemble des notions et concepts abordés dans ce livre et dans les CM et TD de biométrie depuis le début du semestre. Les pré-requis décris plus haut sont censés être maîtrisés, et vous pourrez donc aussi être interrogés sur des notions abordées lors des semestres précédents. 
 
-- les grands principes de stratégie d'échantillonnage abordés par Pierrick Bocher
-- la mise en œuvre de méthodes statistiques adaptées pour répondre aux questions scientifiques posées, telles que nous les traitons en Biométrie
-- la maîtrise du logiciel `RStudio` pour réaliser les analyses de données pertinentes (de l'importation des données et leur mise en forme dans le logiciel, à la réalisation et l'interprétation correcte des tests statistiques appropriés, en passant par l'exploration des statistiques descriptives et la création de graphiques informatifs). Pour ce dernier volet, vous devrez rendre, en plus de votre compte rendu, votre script d'analyse. C'est ce script qui me permettra d'évaluer votre niveau de compétence et de maîtrise de l'outil, tant sur la forme du script (lisibilité, structure, reproductibilité, etc.) que sur le fond (pertinence des analyses réalisées).
-
-Pour vous aider à comprendre ce qui est attendu, je vous fournis ci-dessous la grille critériée dont je me servirai pour évaluer votre travail. C'est cette même grille qui sera utilisée au semestre 6 dans le cadre de l'évaluation sommative pour la biométrie. Je ne peux donc que vous encourager à lire attentivement les critères d'évaluation ci-dessous et à tenter de vous les approprier. Les séances de TP et de TEA qui viennent doivent vous permettre de vous entraîner à produire des scripts de qualité, et à y intégrer des analyses pertinentes et correctement interprétées.
+Pour vous aider à comprendre ce qui est attendu, je vous fournis ci-dessous la grille critériée dont je me servirai pour évaluer le travail que vous devrez produire au semestre 6, dans le cadre de l'évaluation sommative conjointe entre biométrie et stratégie d'échantillonnage. Tous les items de cette grille ne seront évidemment pas évalués lors de l'épreuve terminale de la fin du semestre 5, mais certains le seront. Je ne peux donc que vous encourager à lire attentivement les critères d'évaluation ci-dessous et à tenter de vous les approprier. Les séances de TP qui viennent doivent vous permettre de vous entraîner à produire des scripts de qualité, et à y intégrer des analyses pertinentes et correctement interprétées.
 
 ![](images/Grille.jpg)
 

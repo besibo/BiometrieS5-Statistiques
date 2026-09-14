@@ -14,6 +14,8 @@ book:
     - 01-OneSampleTests.qmd
     - 02-TwoSamplePairedTests.qmd
     - 03-TwoSampleTests.qmd
+    - 04-PropTests.qmd
+    - 05-GoodnessFit.qmd
     - references.qmd
 
 bibliography: all.bib
