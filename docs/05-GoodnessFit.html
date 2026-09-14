@@ -287,7 +287,6 @@ window.Quarto = {
 
 
 
-<p>ATTENTION : ÉCRITURE EN COURS. Ne prenez pas pour argent comptant ce qui figure dans les sections 16.12 et suivantes : elles contiennent de nombreuses maladresses et imprécisions qui seront corrigées prochainement.</p>
 <section id="sec-packages8" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="sec-packages8"><span class="header-section-number">5.1</span> Pré-requis</h2>
 <p>Comme pour chaque nouveau chapitre, je vous conseille de travailler dans un nouveau script que vous placerez dans votre répertoire de travail, et dans une nouvelle session de travail (Menu <code>Session &gt; Restart R</code>). Inutile en revanche de créer un nouveau <code>Rproject</code> : vous pouvez tout à fait avoir plusieurs scripts dans le même répertoire de travail et pour un même <code>Rproject</code>. Comme toujours, consultez les sections du livre du semestre 3 consacrées <a href="https://besibo.github.io/BiometrieS3/01-R-basics.html#sec-script">aux scripts</a> et <a href="https://besibo.github.io/BiometrieS3/01-R-basics.html#les-projets-ou-rprojects">aux projets</a> si vous ne savez plus comment faire.</p>
@@ -306,7 +305,7 @@ window.Quarto = {
 <ul>
 <li><a href="data/poissons_recifaux_lune.csv"><code>poissons_recifaux_lune.csv</code></a></li>
 <li><a href="data/calendrier_lunaire_recifal.csv"><code>calendrier_lunaire_recifal.csv</code></a></li>
-<li><a href="data/loups.csv"><code>loups.csv</code></a></li>
+<li><a href="data/chap08e6MassExtinctions.csv"><code>chap08e6MassExtinctions.csv</code></a></li>
 </ul>
 <p>Enfin, je spécifie ici une fois pour toutes le thème que j’utiliserai pour tous les graphiques de ce chapitre. Libre à vous de choisir un thème différent ou de vous contenter du thème proposé par défaut :</p>
 <div class="cell">
@@ -774,7 +773,7 @@ Modèle proportionnel
 </div>
 </div>
 </div>
-<p>Plus la valeur de <span class="math inline">\(\chi^2\)</span> est grande, plus l’écart entre les effectifs observés et attendus est important. La p-value indique ensuite si un écart au moins aussi grand serait plausible si l’hypothèse nulle était vraie.</p>
+<p>Plus la valeur de <span class="math inline">\(\chi^2\)</span> est grande, plus l’écart entre les effectifs observés et attendus est important. La <em>p</em>-value indique ensuite si un écart au moins aussi grand serait plausible si l’hypothèse nulle était vraie.</p>
 <p>Dans <code>R</code>, le test se réalise avec la fonction <code>chisq.test()</code>. Comme le package <code>janitor</code> possède également une fonction nommée <code>chisq.test()</code>, nous allons appeler explicitement la fonction du package <code>stats</code>, qui est chargé automatiquement avec <code>R</code> :</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>test_lunar <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">chisq.test</span>(</span>
@@ -791,7 +790,7 @@ data:  lunar_summary$observed_count
 X-squared = 156.97, df = 3, p-value &lt; 2.2e-16</code></pre>
 </div>
 </div>
-<p>Ici, la p-value est très petite. On rejette donc l’hypothèse nulle : les dates de fertilisation estimées ne sont pas compatibles avec une répartition simplement proportionnelle au nombre de jours de chaque phase lunaire.</p>
+<p>Ici, la <em>p</em>-value est très petite. On rejette donc l’hypothèse nulle : les dates de fertilisation estimées ne sont pas compatibles avec une répartition simplement proportionnelle au nombre de jours de chaque phase lunaire.</p>
 <p>Cela ne signifie pas que la lune “détermine” à elle seule la reproduction. C’est une conclusion importante. Le test nous dit seulement que le modèle nul proposé ne décrit pas correctement les effectifs observés. L’écart peut venir de la phénologie reproductive des adultes, de la survie différentielle des larves, des conditions de recrutement, ou de plusieurs de ces mécanismes à la fois.</p>
 </section>
 <section id="degrés-de-liberté-et-p-value" class="level2" data-number="5.8">
@@ -980,15 +979,17 @@ probability of success
 </section>
 <section id="sec-gof-binomial" class="level2" data-number="5.12">
 <h2 data-number="5.12" class="anchored" data-anchor-id="sec-gof-binomial"><span class="header-section-number">5.12</span> Ajustement à une loi binomiale</h2>
-<p>Le modèle proportionnel que nous venons d’utiliser permettait de comparer des effectifs observés à des effectifs attendus proportionnels au nombre d’occasions disponibles dans chaque catégorie. On peut aussi utiliser un test de qualité de l’ajustement pour comparer une distribution observée à une <strong>loi de probabilité</strong> particulière.</p>
-<p>Commençons par la loi binomiale. L’exemple utilisé ici porte sur la composition de familles de deux enfants, à partir de données présentées par <span class="citation" data-cites="rodgers2001">Rodgers et Doughty (<a href="references.html#ref-rodgers2001" role="doc-biblioref">2001</a>)</span>. Pour chaque famille, on connaît le nombre de garçons parmi les deux enfants.</p>
+<p>Le modèle proportionnel que nous venons d’utiliser permettait de comparer des effectifs observés à des effectifs attendus proportionnels au nombre d’occasions disponibles dans chaque catégorie. Il s’agissait seulement d’un cas particulier d’utilisation du test de qualité de l’ajustement. Ce type de test permet en effet de comparer une distribution observée à n’importe quelle <strong>loi de probabilité</strong>. Nous en verrons deux dans les sections suivantes : la loi binomiale et la loi de Poisson.</p>
+<p>Commençons par la loi binomiale. L’exemple utilisé ici porte sur la composition de familles de deux enfants, à partir de données présentées par <span class="citation" data-cites="rodgers2001">Rodgers et Doughty (<a href="references.html#ref-rodgers2001" role="doc-biblioref">2001</a>)</span>. Dans cette étude, les chercheurs se sont intéressés au nombre de garçons dans les familles de deux enfants. Au total, 2444 familles ont été intégrées à l’étude. Pour chaque famille, on connaît le nombre de garçons parmi les deux enfants.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>two_child_families <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_boys =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span>,</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">observed_count =</span> <span class="fu">c</span>(<span class="dv">530</span>, <span class="dv">1332</span>, <span class="dv">582</span>)</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>two_child_families</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Création du jeu de données</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>two_child_families <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_boys =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">2</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">observed_count =</span> <span class="fu">c</span>(<span class="dv">530</span>, <span class="dv">1332</span>, <span class="dv">582</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>two_child_families</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 2
   n_boys observed_count
@@ -1013,30 +1014,27 @@ probability of success
 <li>sous le modèle binomial, la probabilité d’avoir un garçon est la même pour chaque enfant ;</li>
 <li>sous le modèle binomial, les issues sont indépendantes les unes des autres.</li>
 </ul>
-<p>Si ces conditions sont raisonnables, le nombre de garçons dans une famille de deux enfants peut être décrit par une loi binomiale :</p>
+<p>Si ces conditions sont respectées, le nombre de garçons dans une famille de deux enfants peut être décrit par une loi binomiale :</p>
 <p><span class="math display">\[X \sim \mathcal{B}(n = 2, p)\]</span></p>
-<p>où <span class="math inline">\(X\)</span> est le nombre de garçons dans une famille, <span class="math inline">\(n\)</span> est le nombre d’enfants par famille, et <span class="math inline">\(p\)</span> est la probabilité qu’un enfant soit un garçon.</p>
+<p>où <span class="math inline">\(X\)</span> est le nombre de garçons dans une famille de deux enfants, <span class="math inline">\(n\)</span> est le nombre d’enfants par famille, et <span class="math inline">\(p\)</span> est la probabilité qu’un enfant soit un garçon.</p>
 <p>Les hypothèses testées sont donc les suivantes :</p>
 <ul>
 <li>H<span class="math inline">\(_0\)</span> : le nombre de garçons dans les familles de deux enfants suit une loi binomiale.</li>
 <li>H<span class="math inline">\(_1\)</span> : le nombre de garçons dans les familles de deux enfants ne suit pas une loi binomiale.</li>
 </ul>
 <p>Pour calculer les effectifs attendus, il faut connaître les probabilités attendues pour les trois catégories : 0 garçon, 1 garçon et 2 garçons. Ces probabilités sont données par la loi binomiale.</p>
-<p>Il reste toutefois un point important : la valeur de <span class="math inline">\(p\)</span> n’est pas donnée dans l’hypothèse nulle. Nous devons donc l’estimer à partir des données. Pour cela, on calcule la proportion totale de garçons dans l’ensemble des familles :</p>
+<p>Il reste toutefois un point important : la valeur de <span class="math inline">\(p\)</span> n’est pas donnée dans l’hypothèse nulle. On pourrait penser que <span class="math inline">\(p\)</span> vaut 0.5, car on suppose que la probabilité qu’un enfant soit un garçon est égale à celle qu’il soit une fille. Toutefois, dans les populations animales, le sex-ratio (le rapport entre le nombre de mâles et le nombre de femelles dans la population) peut varier fortement selon les espèces. Rien ne nous garantit donc que <span class="math inline">\(p = 0.5\)</span> chez les humains. Nous devons donc estimer, à partir des données observées dans cette étude, la proportion <span class="math inline">\(p\)</span> qu’un enfant choisi au hasard dans la population soit un garçon. Pour cela, on calcule la proportion totale de garçons dans l’ensemble des familles :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>n_children <span class="ot">&lt;-</span> <span class="fu">sum</span>(two_child_families<span class="sc">$</span>observed_count) <span class="sc">*</span> <span class="dv">2</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>n_boys_observed <span class="ot">&lt;-</span> <span class="fu">sum</span>(</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  two_child_families<span class="sc">$</span>n_boys <span class="sc">*</span> two_child_families<span class="sc">$</span>observed_count</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>p_boy <span class="ot">&lt;-</span> n_boys_observed <span class="sc">/</span> n_children</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>p_boy</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>n_boys_observed <span class="ot">&lt;-</span> <span class="dv">530</span> <span class="sc">*</span> <span class="dv">0</span> <span class="sc">+</span> <span class="dv">1332</span> <span class="sc">*</span> <span class="dv">1</span> <span class="sc">+</span> <span class="dv">582</span> <span class="sc">*</span> <span class="dv">2</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>n_children <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> (<span class="dv">530</span> <span class="sc">+</span> <span class="dv">1332</span> <span class="sc">+</span> <span class="dv">582</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>p_boy <span class="ot">&lt;-</span> n_boys_observed <span class="sc">/</span> n_children</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>p_boy</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.5106383</code></pre>
 </div>
 </div>
-<p>La valeur de <code>p_boy</code> est la proportion observée de garçons parmi tous les enfants de l’échantillon. On l’utilise comme estimation de <span class="math inline">\(p\)</span> dans la loi binomiale.</p>
+<p>La valeur de <code>p_boy</code> est la proportion observée de garçons parmi tous les enfants de l’échantillon. On l’utilise comme estimation de <span class="math inline">\(p\)</span> dans la loi binomiale. Il est donc important de bien comprendre qu’ici, pour calculer les effectifs attendus, nous n’utilisons pas une valeur théorique de <span class="math inline">\(p\)</span> (comme 0.5), mais une valeur estimée à partir des données observées. Cela signifie que nous avons <strong>estimé un paramètre à partir des données</strong>, ce qui aura un impact sur le calcul du nombre de degrés de liberté pour le test du <span class="math inline">\(\chi^2\)</span> que nous réaliserons plus bas.</p>
 <p>On peut maintenant calculer les probabilités attendues avec <code>dbinom()</code> :</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>two_child_fit <span class="ot">&lt;-</span> two_child_families <span class="sc">|&gt;</span></span>
@@ -1079,7 +1077,7 @@ probability of success
 <p>Le tableau compare maintenant les effectifs observés et les effectifs attendus sous le modèle binomial. On peut représenter cette comparaison graphiquement :</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>two_child_fit <span class="sc">|&gt;</span></span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(n_boys, observed_count, expected_count) <span class="sc">|&gt;</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>expected_prob) <span class="sc">|&gt;</span></span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
 <span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(observed_count, expected_count),</span>
 <span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"type"</span>,</span>
@@ -1138,7 +1136,7 @@ data:  two_child_fit$observed_count
 X-squared = 20.021, df = 2, p-value = 4.492e-05</code></pre>
 </div>
 </div>
-<p>Le test indique un écart net entre les effectifs observés et les effectifs attendus sous le modèle binomial. Toutefois, il faut ici faire attention au nombre de degrés de liberté. La fonction <code>chisq.test()</code> utilise trois catégories, et renvoie donc par défaut :</p>
+<p>Puisque la <em>p</em>-value est très inférieure à 0.05, le test indique un écart net entre les effectifs observés et les effectifs attendus sous le modèle binomial. Toutefois, il faut ici faire attention au nombre de degrés de liberté. La fonction <code>chisq.test()</code> utilise trois catégories, et renvoie donc par défaut :</p>
 <p><span class="math display">\[df = 3 - 1 = 2\]</span></p>
 <p>Mais ce n’est pas le bon nombre de degrés de liberté, car nous avons estimé un paramètre à partir des données : la probabilité <span class="math inline">\(p\)</span> d’avoir un garçon. Il faut donc retirer un degré de liberté supplémentaire :</p>
 <p><span class="math display">\[df = k - 1 - m = 3 - 1 - 1 = 1\]</span></p>
@@ -1156,8 +1154,9 @@ X-squared = 20.021, df = 2, p-value = 4.492e-05</code></pre>
 7.657994e-06 </code></pre>
 </div>
 </div>
-<p>La conclusion reste la même : on rejette l’hypothèse nulle. La distribution du nombre de garçons dans les familles de deux enfants ne correspond pas à celle attendue sous une loi binomiale simple.</p>
-<p>Cela signifie qu’au moins une des hypothèses du modèle binomial n’est probablement pas vérifiée. La probabilité d’avoir un garçon peut varier d’une famille à l’autre, les sexes des enfants d’une même famille peuvent ne pas être strictement indépendants, ou l’échantillon de familles de deux enfants peut être influencé par des décisions familiales d’arrêt ou de poursuite de la reproduction. Par exemple, certaines familles ayant deux enfants du même sexe peuvent décider d’avoir un troisième enfant, ce qui les retire alors de l’ensemble des familles de deux enfants.</p>
+<p>Ici, on utilise la fonction <code>pchisq()</code> du package <code>stats</code>, avec les arguments suivants : - <code>test_two_child$statistic</code> : c’est la valeur du <span class="math inline">\(\chi^2\)</span>, calculée automatiquement par la fonction <code>chisq.test()</code> comme la statistique de notre test. Contrairement au nombre de degrés de libertés, cette valeur n’est pas affectée par le fait que nous ayons estimé un paramètre à partir des données. La valeur du <span class="math inline">\(\chi^2\)</span> renvoyée par le test est donc correcte et c’est celle que nous utilisons ici ; - <code>df = 1</code> : le nombre de degrés de liberté correct que nous venons de calculer manuellement ; - <code>lower.tail = FALSE</code> : il est nécessaire de renseigner cet argument, sinon, au lieu d’obtenir la <em>p</em>-value, on obtiendrait 1 - <em>p</em>-value.</p>
+<p>Ici, la <em>p</em>-value correcte est donc bien calculée pour un test du <span class="math inline">\(\chi^2\)</span> avec 1 degré de liberté. Sa valeur a changé, mais la conclusion reste la même : on rejette l’hypothèse nulle. La distribution du nombre de garçons dans les familles de deux enfants ne correspond pas à celle attendue sous une loi binomiale simple.</p>
+<p>Cela signifie qu’au moins une des hypothèses du modèle binomial n’est probablement pas vérifiée. La probabilité d’avoir un garçon peut varier d’une famille à l’autre, les sexes des enfants d’une même famille peuvent ne pas être strictement indépendants (par exemple si avoir un garçon en premier enfant influence la probabilité d’avoir un autre garçon), ou la probabilité d’avoir un garçon peut ne pas être constante dans le temps. Ici, une explication plus raisonnable est d’ordre sociologique. L’échantillon de familles de deux enfants peut être influencé par des décisions familiales d’arrêt ou de poursuite de la reproduction. Par exemple, certaines familles ayant deux enfants du même sexe peuvent décider d’avoir un troisième enfant, dans l’espoir d’avoir au moins un enfant de chaque sexe. Cela exclut donc d’emblée ces familles de l’étude puisqu’elles ont alors trois enfants et plus deux. Pour vérifier si cet effet est réel, on pourrait faire une étude comparable sur les familles de <strong>deux enfants et plus</strong>, en étudiant uniquement le sexe des deux premiers enfants. La procédure statistique serait exactement la même, mais l’échantillon serait plus représentatif de la population générale, et ne serait certainement pas biaisé par des décisions familiales liées au sexe des deux premiers enfants.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1175,252 +1174,366 @@ X-squared = 20.021, df = 2, p-value = 4.492e-05</code></pre>
 </section>
 <section id="sec-gof-poisson" class="level2" data-number="5.13">
 <h2 data-number="5.13" class="anchored" data-anchor-id="sec-gof-poisson"><span class="header-section-number">5.13</span> Ajustement à une loi de Poisson</h2>
-<p>Le test de qualité de l’ajustement ne sert pas seulement à comparer des effectifs observés à des proportions théoriques fixées à l’avance. Il permet aussi de tester si des données de comptage suivent une distribution de probabilité particulière.</p>
-<p>La loi de Poisson est particulièrement importante pour les variables de comptage. Elle peut décrire le nombre d’événements observés dans une unité d’espace ou de temps lorsque :</p>
+<p>Passons maintenant à l’ajustement d’une distribution observée à une loi de Poisson.</p>
+<p>D’une façon générale, la loi de Poisson est utilisée pour modéliser le nombre d’événements rares qui se produisent dans un intervalle de temps ou d’espace donné. Elle est souvent utilisée dans les domaines de la biologie, de la médecine et de l’ingénierie pour modéliser des phénomènes accidentels, tels que le nombre de mutations génétiques dans un échantillon d’ADN, le nombre d’accidents de la route dans une ville donnée, ou le nombre d’extinctions dans un intervalle de temps donné par exemple.</p>
+<p>La loi de Poisson est particulièrement importante pour les données de comptage, car elle permet de décrire le nombre d’événements observés dans une unité d’espace ou de temps lorsque :</p>
 <ul>
 <li>les événements sont indépendants les uns des autres ;</li>
-<li>la probabilité d’un événement est constante dans l’espace ou dans le temps ;</li>
-<li>les événements ne se regroupent pas en paquets.</li>
+<li>les événements se produisent de manière aléatoire et uniforme dans l’espace ou dans le temps ;</li>
+<li>la probabilité d’un événement est constante en tout point de l’espace étudié ou à tout instant de la période considérée.</li>
 </ul>
-<p>Nous allons utiliser le fichier <a href="data/loups.csv"><code>loups.csv</code></a>, qui contient des données sur le nombre de louveteaux observés dans différentes portées. Les variables disponibles sont :</p>
+<p>Si un phénomène rare suit une distribution de Poisson, cela signifie que le hasard peut expliquer à lui seul la distribution spatiale ou temporelle des données observées, ainsi que la variabilité observée dans les données. À l’inverse, si les données observées ne suivent pas une loi de Poisson, cela suggère que d’autres facteurs, tels que des interactions entre individus, les préférences individuelles, le comportement ou la variabilité des conditions environnementales (et de nombreux autres facteurs), peuvent influencer la distribution des événements.</p>
+<p>La <a href="#fig-distributions-spatiales" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> illustre trois possibilités. Si l’on compte les individus dans des quadrats de même surface :</p>
 <ul>
-<li><code>inbreedCoef</code> : coefficient de consanguinité ;</li>
-<li><code>nPups</code> : nombre de louveteaux dans la portée.</li>
+<li>Une répartition <strong>aléatoire</strong> (graphique du milieu), avec une même densité attendue partout et des positions indépendantes, conduit à des comptages suivant une loi de Poisson. Dans cette situation, la moyenne du nombre d’observations par quadrats est approximativement égale à la variance du nombre d’observations par quadrats. C’est une caractéristique de la distribution de Poisson.</li>
+<li>Une répartition <strong>agrégée</strong> (graphique de gauche) produit davantage de quadrats peu occupés ou très occupés. La moyenne du nombre d’observations par quadrats pourra être proche de la situation aléatoire, mais la variabilité entre les quadrats sera bien supérieure, puisque certains contiendront de nombreuses observations alors que d’autres en contiendront très peu.</li>
+<li>À l’inverse, une répartition <strong>dispersée</strong> (graphique de droite) est plus régulière que la situation aléatoire. On l’observe notamment lorsque les individus ont des comportements de répulsions (quand, par exemple, les individus d’une espèce protègent un territoire, ou quand des humains s’installent dans une salle de cinéma en laissant toujours quelques places vides entre eux). La moyenne du nombre d’observations par quadrats pourra être proche de la situation aléatoire, mais la variabilité entre les quadrats sera plus faible puisque la majorité des quadrats contiendra un nombre d’observations similaire.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>wolves <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/loups.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>wolves</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-distributions-spatiales" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Trois facettes montrent des points regroupés en amas, placés au hasard et régulièrement espacés avec une légère variation de position.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-distributions-spatiales-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="05-GoodnessFit_files/figure-html/fig-distributions-spatiales-1.png" class="img-fluid figure-img" alt="Trois facettes montrent des points regroupés en amas, placés au hasard et régulièrement espacés avec une légère variation de position." width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-distributions-spatiales-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Trois distributions spatiales simulées : agrégée, aléatoire et dispersée. Chaque panneau contient 100 individus dans une surface identique.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Le même raisonnement s’applique à des intervalles de temps de même durée. Nous allons justement en examiner un exemple avec une étude sur le rythme auquel les extinctions d’espèces se produisent au cours des temps géologiques (<span class="citation" data-cites="Raup1982">(<a href="references.html#ref-Raup1982" role="doc-biblioref"><strong>Raup1982?</strong></a>)</span>).</p>
+<p>Le fichier <a href="data/Extinctions.csv"><code>Extinctions.csv</code></a> contient 76 observations. Sa variable <code>numberOfExtinctions</code> indique le nombre de familles d’invertébrés marins disparues dans chacun des 76 intervalles de temps définis dans cette étude.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>extinctions <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/Extinctions.csv"</span>,</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">show_col_types =</span> <span class="cn">FALSE</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>extinctions</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 2
-   inbreedCoef nPups
-         &lt;dbl&gt; &lt;dbl&gt;
- 1        0        6
- 2        0        6
- 3        0.13     7
- 4        0.13     5
- 5        0.13     4
- 6        0.19     8
- 7        0.19     7
- 8        0.19     4
- 9        0.25     6
-10        0.24     3
-# ℹ 14 more rows</code></pre>
+<pre><code># A tibble: 76 × 1
+   numberOfExtinctions
+                 &lt;dbl&gt;
+ 1                   1
+ 2                   1
+ 3                   1
+ 4                   1
+ 5                   1
+ 6                   1
+ 7                   1
+ 8                   1
+ 9                   1
+10                   1
+# ℹ 66 more rows</code></pre>
 </div>
 </div>
-<p>Ici, nous allons nous concentrer uniquement sur <code>nPups</code>, c’est-à-dire sur le nombre de louveteaux par portée. La question posée est la suivante : la distribution observée du nombre de louveteaux par portée est-elle compatible avec une loi de Poisson ?</p>
+<p>Les questions posées sont les suivantes : la distribution observée du nombre d’extinctions par intervalle de temps est-elle compatible avec une loi de Poisson, autrement dit les extinctions de familles d’invertébrés se produisent-elles au hasard au fil du temps ? Certaines périodes concentrent-elles davantage d’extinctions que prévu ? Ou à l’inverse, les extinctions ont elles lieu à un rythme plus régulier que ce que l’on s’attend à observer par hasard ?</p>
 <p>Les hypothèses sont donc :</p>
 <ul>
-<li>H<span class="math inline">\(_0\)</span> : le nombre de louveteaux par portée suit une loi de Poisson.</li>
-<li>H<span class="math inline">\(_1\)</span> : le nombre de louveteaux par portée ne suit pas une loi de Poisson.</li>
+<li>H<span class="math inline">\(_0\)</span> : le nombre d’extinctions par intervalle de temps suit une distribution de Poisson.</li>
+<li>H<span class="math inline">\(_1\)</span> : le nombre d’extinctions par intervalle de temps ne suit pas une distribution de Poisson.</li>
 </ul>
 <p>Commençons par quelques statistiques descriptives :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>wolves <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>extinctions <span class="sc">|&gt;</span></span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_pups =</span> <span class="fu">mean</span>(nPups),</span>
-<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">var_pups =</span> <span class="fu">var</span>(nPups),</span>
-<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ratio_var_mean =</span> <span class="fu">var</span>(nPups) <span class="sc">/</span> <span class="fu">mean</span>(nPups)</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_extinctions =</span> <span class="fu">mean</span>(numberOfExtinctions),</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">var_extinctions =</span> <span class="fu">var</span>(numberOfExtinctions),</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">ratio_var_mean =</span> <span class="fu">var</span>(numberOfExtinctions) <span class="sc">/</span> <span class="fu">mean</span>(numberOfExtinctions)</span>
 <span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 4
-      n mean_pups var_pups ratio_var_mean
-  &lt;int&gt;     &lt;dbl&gt;    &lt;dbl&gt;          &lt;dbl&gt;
-1    24      3.96     3.52          0.889</code></pre>
+      n mean_extinctions var_extinctions ratio_var_mean
+  &lt;int&gt;            &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;
+1    76             4.21            13.7           3.26</code></pre>
 </div>
 </div>
-<p>Pour une loi de Poisson, la moyenne et la variance sont égales. Le rapport variance / moyenne donne donc une première indication :</p>
+<p>Lorsqu’une variable suit une loi de Poisson, sa moyenne et sa variance sont approximativement égales. Le rapport variance / moyenne donne donc une première indication :</p>
 <ul>
 <li>s’il est proche de 1, la distribution est compatible avec une loi de Poisson ;</li>
 <li>s’il est nettement supérieur à 1, les données sont plus agrégées que prévu ;</li>
 <li>s’il est nettement inférieur à 1, les données sont plus régulières que prévu.</li>
 </ul>
-<p>Ici, ce rapport est proche de 1, ce qui suggère que la loi de Poisson n’est pas une hypothèse absurde. Mais ce n’est qu’un examen descriptif. Il faut maintenant comparer les effectifs observés et attendus.</p>
+<p>Ici, la moyenne vaut environ 4,21 et la variance 13,72. Le rapport variance / moyenne vaut donc environ 3,26, ce qui suggère une agrégation des extinctions dans le temps. Mais ce n’est qu’un examen descriptif. Il faut maintenant comparer les effectifs observés et attendus.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>pup_counts <span class="ot">&lt;-</span> wolves <span class="sc">|&gt;</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(nPups, <span class="at">name =</span> <span class="st">"observed"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(<span class="at">nPups =</span> <span class="dv">0</span><span class="sc">:</span><span class="fu">max</span>(nPups), <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">observed =</span> <span class="dv">0</span>))</span>
-<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>pup_counts</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>extinction_counts <span class="ot">&lt;-</span> extinctions <span class="sc">|&gt;</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(numberOfExtinctions, <span class="at">name =</span> <span class="st">"observed"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">numberOfExtinctions =</span> <span class="dv">0</span><span class="sc">:</span><span class="fu">max</span>(numberOfExtinctions),</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">observed =</span> <span class="dv">0</span>)</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>extinction_counts <span class="sc">|&gt;</span></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 2
-  nPups observed
-  &lt;dbl&gt;    &lt;int&gt;
-1     0        0
-2     1        1
-3     2        4
-4     3        8
-5     4        3
-6     5        2
-7     6        3
-8     7        2
-9     8        1</code></pre>
+<pre><code># A tibble: 21 × 2
+   numberOfExtinctions observed
+                 &lt;dbl&gt;    &lt;int&gt;
+ 1                   0        0
+ 2                   1       13
+ 3                   2       15
+ 4                   3       16
+ 5                   4        7
+ 6                   5       10
+ 7                   6        4
+ 8                   7        2
+ 9                   8        1
+10                   9        2
+11                  10        1
+12                  11        1
+13                  12        0
+14                  13        0
+15                  14        1
+16                  15        0
+17                  16        2
+18                  17        0
+19                  18        0
+20                  19        0
+21                  20        1</code></pre>
 </div>
 </div>
-<p>Pour calculer les effectifs attendus sous une loi de Poisson, nous devons connaître le paramètre de cette loi. Pour une loi de Poisson, ce paramètre est la moyenne, souvent notée <span class="math inline">\(\lambda\)</span>. Comme il n’est pas connu, nous allons l’estimer à partir des données :</p>
+<p>La fonction <code>count()</code> ne fournit que les nombres d’extinctions présents dans les données. La fonction <code>complete()</code> permet d’ajouter les valeurs manquantes :</p>
+<ul>
+<li><code>numberOfExtinctions = 0:max(numberOfExtinctions)</code> indique que nous souhaitons une ligne pour chaque entier entre 0 et le maximum observé ;</li>
+<li><code>fill = list(observed = 0)</code> attribue un effectif observé de 0 aux lignes ajoutées.</li>
+</ul>
+<p>Par exemple, si aucun intervalle de temps ne présente 12 extinctions, <code>complete()</code> ajoute une ligne pour cette valeur, avec <code>observed = 0</code>. Cela permet de comparer les effectifs observés et attendus même pour les valeurs absentes de l’échantillon, auxquelles la loi de Poisson attribue une probabilité non nulle.</p>
+<p>Pour calculer les effectifs attendus sous une loi de Poisson, nous devons connaître le paramètre de cette loi. Pour une loi de Poisson, ce paramètre est la moyenne, souvent notée <span class="math inline">\(\lambda\)</span>. Comme il n’est pas connu, nous allons l’estimer à partir des données, ce qui nous fera perdre un degré de liberté, comme dans l’exemple de la distribution binomiale :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>lambda_pups <span class="ot">&lt;-</span> <span class="fu">mean</span>(wolves<span class="sc">$</span>nPups)</span>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>lambda_extinctions <span class="ot">&lt;-</span> <span class="fu">mean</span>(extinctions<span class="sc">$</span>numberOfExtinctions)</span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>lambda_pups</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>lambda_extinctions</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.958333</code></pre>
+<pre><code>[1] 4.210526</code></pre>
 </div>
 </div>
 <p>Nous pouvons maintenant calculer les probabilités attendues grâce à la fonction <code>dpois()</code> :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>pup_fit <span class="ot">&lt;-</span> pup_counts <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>extinction_fit <span class="ot">&lt;-</span> extinction_counts <span class="sc">|&gt;</span></span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">expected_prob =</span> <span class="fu">dpois</span>(nPups, <span class="at">lambda =</span> lambda_pups),</span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">expected =</span> <span class="fu">nrow</span>(wolves) <span class="sc">*</span> expected_prob</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">expected_prob =</span> <span class="fu">dpois</span>(numberOfExtinctions, <span class="at">lambda =</span> lambda_extinctions),</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">expected =</span> <span class="fu">nrow</span>(extinctions) <span class="sc">*</span> expected_prob</span>
 <span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>pup_fit</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>extinction_fit <span class="sc">|&gt;</span></span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 4
-  nPups observed expected_prob expected
-  &lt;dbl&gt;    &lt;int&gt;         &lt;dbl&gt;    &lt;dbl&gt;
-1     0        0        0.0191    0.458
-2     1        1        0.0756    1.81 
-3     2        4        0.150     3.59 
-4     3        8        0.197     4.74 
-5     4        3        0.195     4.69 
-6     5        2        0.155     3.71 
-7     6        3        0.102     2.45 
-8     7        2        0.0577    1.38 
-9     8        1        0.0285    0.685</code></pre>
+<pre><code># A tibble: 21 × 4
+   numberOfExtinctions observed expected_prob    expected
+                 &lt;dbl&gt;    &lt;int&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+ 1                   0        0  0.0148        1.13      
+ 2                   1       13  0.0625        4.75      
+ 3                   2       15  0.132        10.00      
+ 4                   3       16  0.185        14.0       
+ 5                   4        7  0.194        14.8       
+ 6                   5       10  0.164        12.4       
+ 7                   6        4  0.115         8.73      
+ 8                   7        2  0.0691        5.25      
+ 9                   8        1  0.0364        2.76      
+10                   9        2  0.0170        1.29      
+11                  10        1  0.00716       0.544     
+12                  11        1  0.00274       0.208     
+13                  12        0  0.000962      0.0731    
+14                  13        0  0.000312      0.0237    
+15                  14        1  0.0000937     0.00712   
+16                  15        0  0.0000263     0.00200   
+17                  16        2  0.00000692    0.000526  
+18                  17        0  0.00000171    0.000130  
+19                  18        0  0.000000401   0.0000305 
+20                  19        0  0.0000000889  0.00000675
+21                  20        1  0.0000000187  0.00000142</code></pre>
 </div>
 </div>
-<p>Les effectifs attendus sont faibles pour plusieurs valeurs du nombre de louveteaux. Si l’on utilisait directement toutes les catégories, les conditions d’application du test du <span class="math inline">\(\chi^2\)</span> ne seraient pas bien respectées. Dans ce cas, une solution classique consiste à regrouper des catégories voisines, à condition que ce regroupement ait du sens.</p>
-<p>Ici, nous allons distinguer les portées petites (<code>0-2</code> louveteaux), intermédiaires (<code>3-4</code> louveteaux), et grandes (<code>5+</code> louveteaux) :</p>
+<p>Les effectifs attendus sont faibles, ou très faibles, pour plusieurs valeurs de nombre d’extinctions. Les conditions d’application du test du <span class="math inline">\(\chi^2\)</span> ne sont donc pas respectées :</p>
+<ul>
+<li>Certains effectifs attendus sont inférieurs à 1.</li>
+<li>Les effectifs attendus sont inférieurs à 5 pour plus de 20% des catégories.</li>
+</ul>
+<p>Dans ce cas, une solution classique consiste à regrouper des catégories voisines, à condition que ces regroupements aient du sens. On ne regroupe donc que des catégories contigües, et on effectue uniquement les regroupements absolument nécessaires pour que les conditions d’application du test soient vérifiées, mais surtout pas plus (car on perdrait alors de l’information).</p>
+<p>Ici, nous pouvons par exemple regrouper les catégories <code>0</code> et <code>1</code>, puis toutes les valeurs supérieures ou égales à <code>8</code> extinctions. Au lieu de 21 catégories, nous n’en aurons alors plus que huit : <code>0 ou 1</code>, <code>2</code>, <code>3</code>, <code>4</code>, <code>5</code>, <code>6</code>, <code>7</code> et <code>8 et plus</code>. Cette manipulation n’est pas triviale dans <code>R</code>. Assurez-vous de bien comprendre ce qui est fait ici :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>pup_fit_grouped <span class="ot">&lt;-</span> pup_fit <span class="sc">|&gt;</span></span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">case_when</span>(</span>
-<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>      nPups <span class="sc">&lt;=</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"0-2"</span>,</span>
-<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>      nPups <span class="sc">&lt;=</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">"3-4"</span>,</span>
-<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>      nPups <span class="sc">&gt;=</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"5+"</span></span>
-<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">observed =</span> <span class="fu">sum</span>(observed),</span>
-<span id="cb64-11"><a href="#cb64-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">expected =</span> <span class="fu">sum</span>(expected),</span>
-<span id="cb64-12"><a href="#cb64-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> class</span>
-<span id="cb64-13"><a href="#cb64-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb64-14"><a href="#cb64-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">class =</span> <span class="fu">factor</span>(class, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"0-2"</span>, <span class="st">"3-4"</span>, <span class="st">"5+"</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb64-15"><a href="#cb64-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(class)</span>
-<span id="cb64-16"><a href="#cb64-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb64-17"><a href="#cb64-17" aria-hidden="true" tabindex="-1"></a>pup_fit_grouped</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fusion de certaines catégories</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>extinction_fit_grouped <span class="ot">&lt;-</span> extinction_fit <span class="sc">|&gt;</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">case_when</span>(</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>      numberOfExtinctions <span class="sc">&lt;=</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"0 ou 1"</span>,</span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>      numberOfExtinctions <span class="sc">&gt;=</span> <span class="dv">8</span> <span class="sc">~</span> <span class="st">"8 et plus"</span>,</span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="fu">as.character</span>(numberOfExtinctions)</span>
+<span id="cb64-8"><a href="#cb64-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb64-9"><a href="#cb64-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb64-10"><a href="#cb64-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># et calcul des effectifs observes de ces nouvelles catégories</span></span>
+<span id="cb64-11"><a href="#cb64-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">observed =</span> <span class="fu">sum</span>(observed), <span class="at">.by =</span> class)</span>
+<span id="cb64-12"><a href="#cb64-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-13"><a href="#cb64-13" aria-hidden="true" tabindex="-1"></a>extinction_fit_grouped</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  class observed expected
-  &lt;fct&gt;    &lt;int&gt;    &lt;dbl&gt;
-1 0-2          5     5.86
-2 3-4         11     9.42
-3 5+           8     8.23</code></pre>
+<pre><code># A tibble: 8 × 2
+  class     observed
+  &lt;chr&gt;        &lt;int&gt;
+1 0 ou 1          13
+2 2               15
+3 3               16
+4 4                7
+5 5               10
+6 6                4
+7 7                2
+8 8 et plus        9</code></pre>
 </div>
 </div>
-<p>La comparaison graphique est souvent la meilleure façon de comprendre le test :</p>
+<p>Maintenant que les catégories sont fusionnées, nous devons calculer la probabilité de chacune d’elles sous la loi de Poisson. Pour les deux catégories extrêmes, il faut additionner plusieurs probabilités :</p>
+<ol type="1">
+<li>Pour la classe <code>0 ou 1</code>, nous cherchons <span class="math inline">\(P(X \leq 1)\)</span>, soit <span class="math inline">\(P(X = 0) + P(X = 1)\)</span>.</li>
+<li>Pour la classe <code>8 et plus</code>, nous cherchons <span class="math inline">\(P(X \geq 8)\)</span>, soit <span class="math inline">\(P(X = 8) + P(X = 9) + P(X = 10) + \cdots\)</span>, en poursuivant la somme jusqu’à l’infini. Même si le maximum observé dans les données est de 20 extinctions, ce maximum ne constitue pas une limite pour la loi de Poisson : celle-ci attribue une probabilité non nulle à chacun des nombres d’extinctions supérieurs à 20. Nous devons donc inclure dans cette classe les probabilités de <strong>toutes les valeurs supérieures ou égales à 8</strong>, et pas seulement celles observées dans l’échantillon. Nous garantissons ainsi que les huit classes couvrent toutes les valeurs possibles et que leurs probabilités totalisent 1, comme l’exige le test que nous effectuerons ensuite.</li>
+</ol>
+<p>La fonction <code>dpois()</code> donne la probabilité d’une valeur précise. Mais pour calculer des sommes de probabilités, nous devons utiliser <code>ppois()</code> :</p>
+<ul>
+<li><code>ppois(1, lambda = lambda_extinctions, lower.tail = TRUE)</code> donne <span class="math inline">\(P(X \leq 1)\)</span> ;</li>
+<li><code>ppois(7, lambda = lambda_extinctions, lower.tail = FALSE)</code> donne <span class="math inline">\(P(X &gt; 7)\)</span>, c’est-à-dire <span class="math inline">\(P(X \geq 8)\)</span>, donc <span class="math inline">\(P(X = 8) + P(X = 9) + P(X = 10) + \cdots\)</span>.</li>
+</ul>
+<p>Pour les catégories <code>2</code> à <code>7</code>, qui correspondent chacune à une seule valeur, nous conservons <code>dpois()</code>. Et pour passer des probabilités aux nombres attendus de blocs de temps, on multiplie simplement les probabilités par e nombre total de blocs de temps dans cette étude (76).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>pup_fit_grouped <span class="sc">|&gt;</span></span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(observed, expected),</span>
-<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"type"</span>,</span>
-<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"count"</span></span>
-<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> class, <span class="at">y =</span> count, <span class="at">fill =</span> type)) <span class="sc">+</span></span>
-<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">alpha =</span> <span class="fl">0.75</span>) <span class="sc">+</span></span>
-<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Nombre de louveteaux"</span>,</span>
-<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Nombre de portées"</span>,</span>
-<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">""</span>,</span>
-<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution observée et attendue du nombre de louveteaux"</span></span>
-<span id="cb66-14"><a href="#cb66-14" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="05-GoodnessFit_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Les écarts entre effectifs observés et attendus semblent faibles. On peut maintenant réaliser le test. Comme nous avons estimé <span class="math inline">\(\lambda\)</span> à partir des données, nous perdons un degré de liberté. La fonction <code>chisq.test()</code> ne le sait pas. Elle calcule donc une p-value avec un nombre de degrés de liberté trop grand. Nous allons utiliser la statistique du <span class="math inline">\(\chi^2\)</span> renvoyée par le test, puis recalculer nous-mêmes la p-value avec le bon nombre de degrés de liberté.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>test_pups <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">chisq.test</span>(</span>
-<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> pup_fit_grouped<span class="sc">$</span>observed,</span>
-<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">p =</span> pup_fit_grouped<span class="sc">$</span>expected <span class="sc">/</span> <span class="fu">sum</span>(pup_fit_grouped<span class="sc">$</span>expected)</span>
-<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>test_pups</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>extinction_fit_grouped <span class="ot">&lt;-</span> extinction_fit_grouped <span class="sc">|&gt;</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">expected_prob =</span> <span class="fu">c</span>(</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ppois</span>(<span class="dv">1</span>, <span class="at">lambda =</span> lambda_extinctions, <span class="at">lower.tail =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">dpois</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">7</span>, <span class="at">lambda =</span> lambda_extinctions),</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ppois</span>(<span class="dv">7</span>, <span class="at">lambda =</span> lambda_extinctions, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">expected =</span> <span class="fu">nrow</span>(extinctions) <span class="sc">*</span> expected_prob</span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>extinction_fit_grouped</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>
-    Chi-squared test for given probabilities
-
-data:  pup_fit_grouped$observed
-X-squared = 0.37877, df = 2, p-value = 0.8275</code></pre>
+<pre><code># A tibble: 8 × 4
+  class     observed expected_prob expected
+  &lt;chr&gt;        &lt;int&gt;         &lt;dbl&gt;    &lt;dbl&gt;
+1 0 ou 1          13        0.0773     5.88
+2 2               15        0.132     10.00
+3 3               16        0.185     14.0 
+4 4                7        0.194     14.8 
+5 5               10        0.164     12.4 
+6 6                4        0.115      8.73
+7 7                2        0.0691     5.25
+8 8 et plus        9        0.0647     4.91</code></pre>
 </div>
 </div>
-<p>Le nombre correct de degrés de liberté est :</p>
-<p><span class="math display">\[df = k - 1 - m\]</span></p>
-<p>où <span class="math inline">\(k\)</span> est le nombre de catégories après regroupement et <span class="math inline">\(m\)</span> le nombre de paramètres estimés à partir des données. Ici, <span class="math inline">\(k = 3\)</span> et <span class="math inline">\(m = 1\)</span>, car nous avons estimé <span class="math inline">\(\lambda\)</span>. On obtient donc :</p>
+<p>La fonction <code>ppois()</code> permet donc d’inclure toutes les valeurs de chaque catégorie extrême : <code>0</code> et <code>1</code> pour la première, et toutes les valeurs à partir de <code>8</code> pour la dernière, même au-delà du maximum observé dans les données. La somme des probabilités attendues vaut bien 1 :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>df_pups <span class="ot">&lt;-</span> <span class="fu">nrow</span>(pup_fit_grouped) <span class="sc">-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span></span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>df_pups</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(extinction_fit_grouped<span class="sc">$</span>expected_prob)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1</code></pre>
 </div>
 </div>
-<p>La p-value correcte est alors :</p>
+<p>Une seule catégorie sur huit a un effectif attendu inférieur à 5 (environ 4,91 pour <code>8+</code>), soit moins de 20% des catégories, et aucun n’est inférieur à 1 : les conditions d’application du test du <span class="math inline">\(\chi^2\)</span> sont donc maintenant respectées.</p>
+<p>La comparaison graphique est souvent la meilleure façon de comprendre la structure des données et ses éventuels écarts par rapport à la distribution de Poisson :</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>chi2_pups <span class="ot">&lt;-</span> <span class="fu">sum</span>(</span>
-<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  (pup_fit_grouped<span class="sc">$</span>observed <span class="sc">-</span> pup_fit_grouped<span class="sc">$</span>expected)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span></span>
-<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>    pup_fit_grouped<span class="sc">$</span>expected</span>
-<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">-</span> <span class="fu">pchisq</span>(chi2_pups, <span class="at">df =</span> df_pups)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>extinction_fit_grouped <span class="sc">|&gt;</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(observed, expected),</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"type"</span>,</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"count"</span></span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> class, <span class="at">y =</span> count, <span class="at">fill =</span> type)) <span class="sc">+</span></span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">alpha =</span> <span class="fl">0.75</span>, <span class="at">color =</span> <span class="st">"grey30"</span>) <span class="sc">+</span></span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Nombre d'extinctions"</span>,</span>
+<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Nombre d'intervalles de temps"</span>,</span>
+<span id="cb70-12"><a href="#cb70-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">""</span>,</span>
+<span id="cb70-13"><a href="#cb70-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Distribution observée et attendue du nombre d'extinctions"</span></span>
+<span id="cb70-14"><a href="#cb70-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb70-15"><a href="#cb70-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_viridis_d</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05-GoodnessFit_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>On observe notamment un excès d’intervalles avec très peu d’extinctions (zéro, une, deux ou trois) et d’intervalles avec au moins huit extinctions, ainsi qu’un déficit pour plusieurs valeurs intermédiaires (entre quatre et sept extinctions). Contrairement aux prédictions de la loi de Poisson, les données semblent donc montrer que le nombre d’extinctions est soit très faible, soit très élevé, mais rarement intermédiaire.</p>
+<p>On peut maintenant réaliser le test. Comme nous avons estimé <span class="math inline">\(\lambda\)</span> à partir des données, nous perdons un degré de liberté. La fonction <code>chisq.test()</code> ne le sait pas. Elle calcule donc une <em>p</em>-value avec un nombre de degrés de liberté trop grand. Nous allons utiliser la statistique du <span class="math inline">\(\chi^2\)</span> renvoyée par le test, puis recalculer nous-mêmes la <em>p</em>-value avec le bon nombre de degrés de liberté, comme nous l’avons fait dans la <a href="#sec-gof-binomial" class="quarto-xref"><span>Section 5.12</span></a> pour la loi binomiale :</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>test_extinctions <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">chisq.test</span>(</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> extinction_fit_grouped<span class="sc">$</span>observed,</span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">p =</span> extinction_fit_grouped<span class="sc">$</span>expected <span class="sc">/</span> <span class="fu">sum</span>(extinction_fit_grouped<span class="sc">$</span>expected)</span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in stats::chisq.test(x = extinction_fit_grouped$observed, p =
+extinction_fit_grouped$expected/sum(extinction_fit_grouped$expected)):
+L’approximation du Chi-2 est peut-être incorrecte</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>test_extinctions</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.5288993</code></pre>
+<pre><code>
+    Chi-squared test for given probabilities
+
+data:  extinction_fit_grouped$observed
+X-squared = 23.95, df = 7, p-value = 0.001163</code></pre>
 </div>
 </div>
-<p>Ici, la p-value est grande. On ne rejette donc pas l’hypothèse nulle. La distribution du nombre de louveteaux par portée n’est pas significativement différente de celle attendue sous une loi de Poisson.</p>
-<p>Cette conclusion doit toutefois rester prudente. L’échantillon ne contient que 24 portées, ce qui limite fortement la puissance du test. Ne pas rejeter H<span class="math inline">\(_0\)</span> ne signifie donc pas que la loi de Poisson est vraie. Cela signifie seulement que, avec ces données, nous n’avons pas de preuve claire d’un écart à cette loi.</p>
-<div id="imp-gof-df" class="callout callout-style-default callout-important callout-titled">
+<p><code>R</code> affiche ici un avertissement, car <code>chisq.test()</code> signale tout effectif attendu inférieur à 5.</p>
+<p>Le nombre correct de degrés de liberté est :</p>
+<p><span class="math display">\[df = k - 1 - m\]</span></p>
+<p>où <span class="math inline">\(k\)</span> est le nombre de catégories après regroupement et <span class="math inline">\(m\)</span> le nombre de paramètres estimés à partir des données. Ici, <span class="math inline">\(k = 8\)</span> et <span class="math inline">\(m = 1\)</span>, car nous avons estimé <span class="math inline">\(\lambda\)</span> à partir des données observées. On obtient donc :</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>df_extinctions <span class="ot">&lt;-</span> <span class="fu">nrow</span>(extinction_fit_grouped) <span class="sc">-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>df_extinctions</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6</code></pre>
+</div>
+</div>
+<p>La <em>p</em>-value correcte est alors :</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pchisq</span>(</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  test_extinctions<span class="sc">$</span>statistic,</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">df =</span> df_extinctions,</span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower.tail =</span> <span class="cn">FALSE</span></span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   X-squared 
+0.0005334919 </code></pre>
+</div>
+</div>
+<p>On obtient une statistique du <span class="math inline">\(\chi^2\)</span> d’environ 23,95, avec 6 degrés de liberté, et une <em>p</em>-value d’environ 0,00053. On rejette donc l’hypothèse nulle : la distribution du nombre d’extinctions par intervalle de temps n’est pas compatible avec la loi de Poisson ajustée.</p>
+<p>La variance observée est nettement supérieure à la moyenne (voir plus haut), ce qui est cohérent avec une distribution agrégée. De même, les écarts entre effectifs observés et attendus (tableau et graphique ci-dessus) vont dans le même sens. Les données et les résultats du test indiquent une agrégation temporelle des extinctions, cohérente avec l’existence de périodes d’extinctions massives. Le rejet de l’hypothèse nulle et cette conclusion ne permettent toutefois pas d’identifier les causes de ces extinctions de masse.</p>
+<div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Important&nbsp;5.1: Estimation des paramètres et degrés de liberté
+Estimation des paramètres et degrés de liberté
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Quand les probabilités attendues sont entièrement fixées par l’hypothèse nulle, le nombre de degrés de liberté vaut :</p>
-<p><span class="math display">\[df = k - 1\]</span></p>
-<p>où <span class="math inline">\(k\)</span> est le nombre de catégories.</p>
-<p>Quand un ou plusieurs paramètres sont estimés à partir des données, il faut retirer un degré de liberté supplémentaire pour chaque paramètre estimé :</p>
+<p>Quand on calcule les effectifs attendus, si un ou plusieurs paramètres sont estimés à partir des données, il faut retirer un degré de liberté supplémentaire pour chaque paramètre estimé :</p>
 <p><span class="math display">\[df = k - 1 - m\]</span></p>
-<p>Cette correction est indispensable pour obtenir la bonne p-value.</p>
+<p>où <span class="math inline">\(k\)</span> est le nombre de catégories, et <span class="math inline">\(m\)</span> le nombre de paramètres estimés à partir des données. Cette correction est indispensable pour obtenir la bonne <em>p</em>-value.</p>
 </div>
 </div>
 </section>
 <section id="comment-choisir-et-interpréter-un-test-de-qualité-de-lajustement" class="level2" data-number="5.14">
 <h2 data-number="5.14" class="anchored" data-anchor-id="comment-choisir-et-interpréter-un-test-de-qualité-de-lajustement"><span class="header-section-number">5.14</span> Comment choisir et interpréter un test de qualité de l’ajustement ?</h2>
-<p>On peut résumer les cas les plus fréquents de la façon suivante :</p>
+<p>Le choix dépend de la question posée et du modèle auquel nous souhaitons comparer les données :</p>
 <ul>
-<li><strong>une distribution catégorielle</strong> à comparer à des proportions fixées à l’avance : <code>chisq.test(x, p = ...)</code></li>
-<li><strong>deux catégories seulement</strong>, avec une proportion à comparer à une valeur théorique : <code>binom.test()</code>, ou <code>chisq.test()</code> si les effectifs sont grands</li>
-<li><strong>une variable de comptage</strong> à comparer à une loi de Poisson : calcul des probabilités attendues avec <code>dpois()</code>, puis test du <span class="math inline">\(\chi^2\)</span></li>
-<li><strong>une distribution de nombres de succès</strong> à comparer à une loi binomiale : calcul des probabilités attendues avec <code>dbinom()</code>, puis test du <span class="math inline">\(\chi^2\)</span></li>
+<li><strong>Comparer les effectifs de plusieurs catégories à des proportions théoriques fixées à l’avance</strong> : utiliser <code>chisq.test(x, p = ...)</code>, si les effectifs attendus permettent l’approximation du <span class="math inline">\(\chi^2\)</span>.</li>
+<li><strong>Comparer une proportion à une valeur théorique, avec deux catégories seulement</strong> : utiliser <code>binom.test()</code>. Ce test exact convient aussi aux petits échantillons. Le test du <span class="math inline">\(\chi^2\)</span> constitue une autre possibilité lorsque les effectifs attendus sont suffisamment grands.</li>
+<li><strong>Comparer une distribution de nombres de succès à une loi binomiale</strong> : calculer les probabilités attendues avec <code>dbinom()</code> et, si nécessaire, <code>pbinom()</code>, puis réaliser un test du <span class="math inline">\(\chi^2\)</span>. Il s’agit ici de comparer une distribution entière au modèle binomial, comme dans l’exemple du nombre de garçons par famille.</li>
+<li><strong>Comparer une distribution de comptages à une loi de Poisson</strong> : calculer les probabilités attendues avec <code>dpois()</code> et, pour les catégories regroupées, <code>ppois()</code>, puis réaliser un test du <span class="math inline">\(\chi^2\)</span>.</li>
 </ul>
-<p>Dans tous les cas, il faut examiner les données avant le test. En particulier :</p>
+<p>Le test exact de Fisher (<code>fisher.test()</code>) répond à une autre question : il permet de tester l’association entre deux variables catégorielles dans un tableau de contingence, notamment lorsque les effectifs sont faibles. Il ne constitue pas une solution de remplacement au test de qualité de l’ajustement présenté ici.</p>
+<p>Avant de réaliser le test, plusieurs points doivent être vérifiés :</p>
 <ol type="1">
-<li>les catégories doivent avoir un sens biologique ou expérimental ;</li>
-<li>les effectifs attendus doivent être suffisamment grands ;</li>
-<li>les regroupements éventuels doivent être décidés de façon raisonnable ;</li>
-<li>les paramètres estimés à partir des données doivent être pris en compte dans les degrés de liberté ;</li>
-<li>l’interprétation doit porter sur le modèle testé, et pas sur une idée vague de “bonne” ou “mauvaise” distribution.</li>
+<li>les observations doivent être indépendantes ;</li>
+<li>les catégories doivent être mutuellement exclusives et couvrir toutes les valeurs possibles sous le modèle testé ;</li>
+<li>pour utiliser l’approximation du <span class="math inline">\(\chi^2\)</span>, les effectifs <strong>attendus</strong> doivent respecter les conditions présentées dans ce chapitre ; cette contrainte ne s’applique pas au test binomial exact ;</li>
+<li>les regroupements éventuels doivent être justifiés et ne doivent pas être choisis pour obtenir une conclusion particulière ;</li>
+<li>pour les ajustements étudiés ici, chaque paramètre estimé à partir des données retire un degré de liberté au test du <span class="math inline">\(\chi^2\)</span>.</li>
 </ol>
+<p>Enfin, rejeter H<span class="math inline">\(_0\)</span> indique un écart entre les données et le modèle testé, sans en identifier automatiquement la cause. Ne pas rejeter H<span class="math inline">\(_0\)</span> signifie que les données ne mettent pas en évidence d’écart significatif. Cela signifie que les données sont compatibles avec l’hypothèse nulle, cela ne prouve pas que le modèle est vrai dans l’absolu.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1446,16 +1559,145 @@ Attention
 <li>distribution de Poisson ;</li>
 <li>plus généralement, toute distribution pour laquelle on peut calculer des probabilités attendues.</li>
 </ul>
-<p>Comme toujours, le test ne suffit pas. Il faut aussi examiner les effectifs observés, les effectifs attendus, les contributions au <span class="math inline">\(\chi^2\)</span>, les conditions d’application, et la magnitude des écarts observés.</p>
+<p>Comme toujours, le test ne suffit pas. Il faut aussi examiner les effectifs observés, les effectifs attendus, les contributions au <span class="math inline">\(\chi^2\)</span>, les conditions d’application, et la magnitude des écarts observés pour être en mesure de discuter pertinemment des résultats des tests.</p>
 </section>
 <section id="exercices-dapplication" class="level2" data-number="5.16">
 <h2 data-number="5.16" class="anchored" data-anchor-id="exercices-dapplication"><span class="header-section-number">5.16</span> Exercices d’application</h2>
 <ol type="1">
-<li><p>À partir du jeu de données <code>poissons_recifaux_lune.csv</code>, testez si les dates de fertilisation estimées sont réparties de façon égale entre les quatre phases lunaires. Comparez ce test avec le modèle proportionnel au nombre de jours de chaque phase lunaire présenté dans ce chapitre.</p></li>
+<li><p>Un étudiant propose de tester la répartition des dates de fertilisation estimées entre les quatre phases lunaires avec <code>chisq.test(observed)</code>, sans préciser l’argument <code>p</code>. Quelles proportions attendues cette commande utilise-t-elle ? Réalisez ce test et comparez les effectifs attendus, la statistique du <span class="math inline">\(\chi^2\)</span> et la <em>p</em>-value à ceux du modèle présenté dans le chapitre. Expliquez pourquoi le modèle décrit dans le cours tient mieux compte des occasions de fertilisation disponibles. Si les deux tests conduisent à la même conclusion, cela suffit-il à justifier le choix de proportions égales ?</p></li>
 <li><p>À partir du jeu de données <code>poissons_recifaux_lune.csv</code>, regroupez les jours lunaires en deux périodes seulement : du jour 0 au jour 14, puis du jour 15 au jour 29. Les dates de fertilisation estimées sont-elles réparties proportionnellement au nombre de jours de ces deux périodes ?</p></li>
-<li><p>Reprenez le jeu de données <code>loups.csv</code>. Réalisez le test d’ajustement à une loi de Poisson sans regrouper les catégories. Examinez les effectifs attendus. Pourquoi ce test n’est-il pas satisfaisant ?</p></li>
-<li><p>Toujours avec <code>loups.csv</code>, proposez un autre regroupement des nombres de louveteaux. Recalculez le test et comparez la conclusion à celle du chapitre.</p></li>
-<li><p>À partir du jeu de données <code>HornedLizards.csv</code>, testez si les lézards vivants et tués par prédation sont également fréquents dans l’échantillon. Comparez les résultats de <code>chisq.test()</code> et <code>binom.test()</code>.</p></li>
+<li><p>Les résultats d’un croisement correspondent-ils aux prédictions mendéliennes ?</p>
+<p><span class="citation" data-cites="Mendel1866">(<a href="references.html#ref-Mendel1866" role="doc-biblioref"><strong>Mendel1866?</strong></a>)</span> a étudié simultanément la forme et la couleur des graines de pois. Après autofécondation de plants doubles hétérozygotes, il a obtenu les résultats suivants :</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Phénotype des graines</th>
+<th style="text-align: right;">Effectif observé</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Rondes et jaunes</td>
+<td style="text-align: right;">315</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rondes et vertes</td>
+<td style="text-align: right;">108</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ridées et jaunes</td>
+<td style="text-align: right;">101</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ridées et vertes</td>
+<td style="text-align: right;">32</td>
+</tr>
+</tbody>
+</table>
+<p>Si les deux gènes se transmettent indépendamment et si les allèles responsables des caractères « rond » et « jaune » sont complètement dominants, les proportions attendues sont respectivement <span class="math inline">\(9/16\)</span>, <span class="math inline">\(3/16\)</span>, <span class="math inline">\(3/16\)</span> et <span class="math inline">\(1/16\)</span>.</p>
+<p>Construisez un tableau contenant ces données, puis mettez en œuvre toute la démarche permettant de tester leur compatibilité avec ce modèle : hypothèses, effectifs attendus, vérification des conditions, représentation graphique, test et conclusion biologique. Justifiez le nombre de degrés de liberté utilisé.</p>
+<p>Une absence de différence significative permet-elle d’affirmer que les deux gènes se transmettent indépendamment ? Expliquez.</p></li>
+<li><p>Les cellules de levure sont-elles réparties au hasard ?</p>
+<p>Pour étudier la précision des comptages au microscope, <span class="citation" data-cites="Student1907">(<a href="references.html#ref-Student1907" role="doc-biblioref"><strong>Student1907?</strong></a>)</span> a compté les cellules de levure dans 400 cases de même surface d’une chambre de comptage. Voici les résultats de l’échantillon A, également disponibles dans le jeu de données <code>HistData::Yeast</code> :</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Nombre de cellules dans une case</th>
+<th style="text-align: right;">Nombre de cases</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">213</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">128</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">37</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">18</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<p>On veut savoir si les cellules se répartissent au hasard et de façon indépendante sur toute la surface examinée.</p>
+<p>À quelle distribution statistique faut-il comparer les données pour tester ce modèle ? Mettez en œuvre toute la démarche permettant de répondre à cette question.</p>
+<p>Attention : chaque ligne du tableau représente une catégorie de comptage, et non une case observée. Vous devrez donc probablement reconstituer les données brutes (avec <code>rep()</code> par exemple) pour reproduire la démarche décrite dans ce chapitre. Ainsi, vous devrez tenir compte des effectifs pour estimer le nombre moyen de cellules par case. Calculez les effectifs attendus et proposez, si nécessaire, un regroupement justifié.</p>
+<p>Faites un graphique comparant les effectifs observés et attendus et interprétez ce graphique ainsi que les résultats du test. En vous appuyant sur les écarts observés, discutez également les conséquences possibles pour la précision d’une estimation de concentration fondée sur quelques cases seulement.</p></li>
+<li><p>Les génotypes des ours de Kermode suivent-ils les proportions de Hardy-Weinberg ?</p>
+<p>Chez certains ours noirs de Colombie-Britannique, un variant récessif du gène <em>MC1R</em> est associé à un pelage blanc <span class="citation" data-cites="Ritland2001">(<a href="references.html#ref-Ritland2001" role="doc-biblioref"><strong>Ritland2001?</strong></a>)</span>. Nous noterons ici les deux allèles <span class="math inline">\(B\)</span> et <span class="math inline">\(b\)</span> : les individus <span class="math inline">\(BB\)</span> et <span class="math inline">\(Bb\)</span> ont un pelage sombre, tandis que les individus <span class="math inline">\(bb\)</span> ont un pelage blanc.</p>
+<p>Le jeu de données pédagogique issu de cette étude contient les effectifs suivants :</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Génotype</th>
+<th style="text-align: right;">Effectif observé</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(BB\)</span></td>
+<td style="text-align: right;">42</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(Bb\)</span></td>
+<td style="text-align: right;">24</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(bb\)</span></td>
+<td style="text-align: right;">21</td>
+</tr>
+</tbody>
+</table>
+<p>Sous le modèle de Hardy-Weinberg, les proportions attendues sont <span class="math inline">\(p^2\)</span>, <span class="math inline">\(2p(1-p)\)</span> et <span class="math inline">\((1-p)^2\)</span>, où <span class="math inline">\(p\)</span> est la fréquence de l’allèle <span class="math inline">\(B\)</span>. Cette fréquence n’est pas connue et doit être estimée à partir des données.</p>
+<p>Estimez <span class="math inline">\(p\)</span> en comptant les copies de l’allèle <span class="math inline">\(B\)</span>, puis testez la compatibilité des effectifs observés avec ce modèle. Présentez les hypothèses, les effectifs attendus, la vérification des conditions, un graphique, le test et une conclusion biologique. Justifiez notamment le nombre de degrés de liberté.</p>
+<p>Quelle catégorie contribue le plus à l’écart au modèle ? Un écart significatif permet-il de conclure que les ours choisissent leur partenaire en fonction de sa couleur ? Discutez notamment l’effet possible d’un regroupement d’individus provenant de populations dont les fréquences alléliques diffèrent.</p></li>
+<li><p>Une plante parasite peut-elle localiser son hôte grâce à son odeur ?</p>
+<p>La cuscute (<em>Cuscuta pentagona</em>) est une plante parasite qui doit rapidement trouver une plante hôte après sa germination. Runyon et ses collaborateurs (2006) ont étudié le rôle des composés volatils émis par les plantes dans cette recherche.</p>
+<p>Dans l’une de leurs expériences, des plantules sont exposées à une source de composés volatils extraits de plants de tomate. La direction finale de leur croissance est classée dans quatre secteurs angulaires de même taille :</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Direction par rapport à la source</th>
+<th style="text-align: right;">Nombre de plantules</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Vers la source</td>
+<td style="text-align: right;">17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">À gauche</td>
+<td style="text-align: right;">7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">À droite</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">À l’opposé de la source</td>
+<td style="text-align: right;">2</td>
+</tr>
+</tbody>
+</table>
+<p>Les directions de croissance sont-elles compatibles avec une absence de préférence directionnelle ? Construisez un tableau contenant les données et mettez en œuvre toute la démarche : formulation des hypothèses, choix des probabilités théoriques, calcul des effectifs attendus, vérification des conditions, représentation graphique, test et conclusion biologique.</p>
+<p>Un rejet de l’hypothèse nulle suffit-il, à lui seul, à montrer une attraction vers la source ? Appuyez-vous sur les écarts entre effectifs observés et attendus pour préciser l’interprétation.</p>
+<p>Supposons maintenant que la question posée avant l’expérience soit plus ciblée : les plantules poussent-elles vers la source plus souvent que prévu en l’absence de préférence ? Regroupez les observations en deux catégories, « vers la source » et « autres directions ». Quelle est la probabilité théorique de la première catégorie ? Réalisez un test binomial exact unilatéral et comparez sa conclusion à celle du test précédent. Expliquez pourquoi les deux tests ne répondent pas exactement à la même question.</p>
+<p>Enfin, proposez un dispositif témoin permettant de vérifier que l’orientation observée est liée aux composés volatils, plutôt qu’à une autre caractéristique du dispositif expérimental.</p></li>
 </ol>
 
 

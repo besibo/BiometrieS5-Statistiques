@@ -1,7 +1,5 @@
 # Qualité de l'ajustement {#sec-goodness-fit}
 
-ATTENTION : ÉCRITURE EN COURS. Ne prenez pas pour argent comptant ce qui figure dans les sections 16.12 et suivantes : elles contiennent de nombreuses maladresses et imprécisions qui seront corrigées prochainement.
-
 ## Pré-requis {#sec-packages8}
 
 Comme pour chaque nouveau chapitre, je vous conseille de travailler dans un nouveau script que vous placerez dans votre répertoire de travail, et dans une nouvelle session de travail (Menu `Session > Restart R`). Inutile en revanche de créer un nouveau `Rproject` : vous pouvez tout à fait avoir plusieurs scripts dans le même répertoire de travail et pour un même `Rproject`. Comme toujours, consultez les sections du livre du semestre 3 consacrées [aux scripts](https://besibo.github.io/BiometrieS3/01-R-basics.html#sec-script) et [aux projets](https://besibo.github.io/BiometrieS3/01-R-basics.html#les-projets-ou-rprojects) si vous ne savez plus comment faire.
@@ -25,7 +23,7 @@ Vous aurez également besoin des jeux de données suivants que vous pouvez dès 
 
 - [`poissons_recifaux_lune.csv`](data/poissons_recifaux_lune.csv)
 - [`calendrier_lunaire_recifal.csv`](data/calendrier_lunaire_recifal.csv)
-- [`loups.csv`](data/loups.csv)
+- [`chap08e6MassExtinctions.csv`](data/chap08e6MassExtinctions.csv)
 
 Enfin, je spécifie ici une fois pour toutes le thème que j'utiliserai pour tous les graphiques de ce chapitre. Libre à vous de choisir un thème différent ou de vous contenter du thème proposé par défaut :
 
@@ -359,7 +357,7 @@ lunar_fit |>
   )
 ```
 
-Plus la valeur de $\chi^2$ est grande, plus l'écart entre les effectifs observés et attendus est important. La p-value indique ensuite si un écart au moins aussi grand serait plausible si l'hypothèse nulle était vraie.
+Plus la valeur de $\chi^2$ est grande, plus l'écart entre les effectifs observés et attendus est important. La *p*-value indique ensuite si un écart au moins aussi grand serait plausible si l'hypothèse nulle était vraie.
 
 Dans `R`, le test se réalise avec la fonction `chisq.test()`. Comme le package `janitor` possède également une fonction nommée `chisq.test()`, nous allons appeler explicitement la fonction du package `stats`, qui est chargé automatiquement avec `R` :
 
@@ -372,7 +370,7 @@ test_lunar <- stats::chisq.test(
 test_lunar
 ```
 
-Ici, la p-value est très petite. On rejette donc l'hypothèse nulle : les dates de fertilisation estimées ne sont pas compatibles avec une répartition simplement proportionnelle au nombre de jours de chaque phase lunaire.
+Ici, la *p*-value est très petite. On rejette donc l'hypothèse nulle : les dates de fertilisation estimées ne sont pas compatibles avec une répartition simplement proportionnelle au nombre de jours de chaque phase lunaire.
 
 Cela ne signifie pas que la lune "détermine" à elle seule la reproduction. C'est une conclusion importante. Le test nous dit seulement que le modèle nul proposé ne décrit pas correctement les effectifs observés. L'écart peut venir de la phénologie reproductive des adultes, de la survie différentielle des larves, des conditions de recrutement, ou de plusieurs de ces mécanismes à la fois.
 
@@ -526,11 +524,13 @@ En pratique, si la question porte sur une proportion unique et que vous disposez
 
 ## Ajustement à une loi binomiale {#sec-gof-binomial}
 
-Le modèle proportionnel que nous venons d'utiliser permettait de comparer des effectifs observés à des effectifs attendus proportionnels au nombre d'occasions disponibles dans chaque catégorie. On peut aussi utiliser un test de qualité de l'ajustement pour comparer une distribution observée à une **loi de probabilité** particulière.
+Le modèle proportionnel que nous venons d'utiliser permettait de comparer des effectifs observés à des effectifs attendus proportionnels au nombre d'occasions disponibles dans chaque catégorie. Il s'agissait seulement d'un cas particulier d'utilisation du test de qualité de l'ajustement. Ce type de test permet en effet de comparer une distribution observée à n'importe quelle **loi de probabilité**. Nous en verrons deux dans les sections suivantes : la loi binomiale et la loi de Poisson.
 
-Commençons par la loi binomiale. L'exemple utilisé ici porte sur la composition de familles de deux enfants, à partir de données présentées par @rodgers2001. Pour chaque famille, on connaît le nombre de garçons parmi les deux enfants.
+Commençons par la loi binomiale. L'exemple utilisé ici porte sur la composition de familles de deux enfants, à partir de données présentées par @rodgers2001. Dans cette étude, les chercheurs se sont intéressés au nombre de garçons dans les familles de deux enfants. Au total, 2444 familles ont été intégrées à l'étude. Pour chaque famille, on connaît le nombre de garçons parmi les deux enfants.
 
 ```{r}
+# Création du jeu de données
+
 two_child_families <- tibble(
   n_boys = 0:2,
   observed_count = c(530, 1332, 582)
@@ -555,11 +555,11 @@ La loi binomiale est adaptée ici parce que chaque famille de deux enfants peut 
 - sous le modèle binomial, la probabilité d'avoir un garçon est la même pour chaque enfant ;
 - sous le modèle binomial, les issues sont indépendantes les unes des autres.
 
-Si ces conditions sont raisonnables, le nombre de garçons dans une famille de deux enfants peut être décrit par une loi binomiale :
+Si ces conditions sont respectées, le nombre de garçons dans une famille de deux enfants peut être décrit par une loi binomiale :
 
 $$X \sim \mathcal{B}(n = 2, p)$$
 
-où $X$ est le nombre de garçons dans une famille, $n$ est le nombre d'enfants par famille, et $p$ est la probabilité qu'un enfant soit un garçon.
+où $X$ est le nombre de garçons dans une famille de deux enfants, $n$ est le nombre d'enfants par famille, et $p$ est la probabilité qu'un enfant soit un garçon.
 
 Les hypothèses testées sont donc les suivantes :
 
@@ -568,20 +568,17 @@ Les hypothèses testées sont donc les suivantes :
 
 Pour calculer les effectifs attendus, il faut connaître les probabilités attendues pour les trois catégories : 0 garçon, 1 garçon et 2 garçons. Ces probabilités sont données par la loi binomiale.
 
-Il reste toutefois un point important : la valeur de $p$ n'est pas donnée dans l'hypothèse nulle. Nous devons donc l'estimer à partir des données. Pour cela, on calcule la proportion totale de garçons dans l'ensemble des familles :
+Il reste toutefois un point important : la valeur de $p$ n'est pas donnée dans l'hypothèse nulle. On pourrait penser que $p$ vaut 0.5, car on suppose que la probabilité qu'un enfant soit un garçon est égale à celle qu'il soit une fille. Toutefois, dans les populations animales, le sex-ratio (le rapport entre le nombre de mâles et le nombre de femelles dans la population) peut varier fortement selon les espèces. Rien ne nous garantit donc que $p = 0.5$ chez les humains. Nous devons donc estimer, à partir des données observées dans cette étude, la proportion $p$ qu'un enfant choisi au hasard dans la population soit un garçon. Pour cela, on calcule la proportion totale de garçons dans l'ensemble des familles :
 
 ```{r}
-n_children <- sum(two_child_families$observed_count) * 2
-n_boys_observed <- sum(
-  two_child_families$n_boys * two_child_families$observed_count
-)
-
+n_boys_observed <- 530 * 0 + 1332 * 1 + 582 * 2
+n_children <- 2 * (530 + 1332 + 582)
 p_boy <- n_boys_observed / n_children
 
 p_boy
 ```
 
-La valeur de `p_boy` est la proportion observée de garçons parmi tous les enfants de l'échantillon. On l'utilise comme estimation de $p$ dans la loi binomiale.
+La valeur de `p_boy` est la proportion observée de garçons parmi tous les enfants de l'échantillon. On l'utilise comme estimation de $p$ dans la loi binomiale. Il est donc important de bien comprendre qu'ici, pour calculer les effectifs attendus, nous n'utilisons pas une valeur théorique de $p$ (comme 0.5), mais une valeur estimée à partir des données observées. Cela signifie que nous avons **estimé un paramètre à partir des données**, ce qui aura un impact sur le calcul du nombre de degrés de liberté pour le test du $\chi^2$ que nous réaliserons plus bas.
 
 On peut maintenant calculer les probabilités attendues avec `dbinom()` :
 
@@ -615,7 +612,7 @@ Le tableau compare maintenant les effectifs observés et les effectifs attendus 
 
 ```{r}
 two_child_fit |>
-  select(n_boys, observed_count, expected_count) |>
+  select(-expected_prob) |>
   pivot_longer(
     cols = c(observed_count, expected_count),
     names_to = "type",
@@ -658,7 +655,7 @@ test_two_child <- stats::chisq.test(
 test_two_child
 ```
 
-Le test indique un écart net entre les effectifs observés et les effectifs attendus sous le modèle binomial. Toutefois, il faut ici faire attention au nombre de degrés de liberté. La fonction `chisq.test()` utilise trois catégories, et renvoie donc par défaut :
+Puisque la *p*-value est très inférieure à 0.05, le test indique un écart net entre les effectifs observés et les effectifs attendus sous le modèle binomial. Toutefois, il faut ici faire attention au nombre de degrés de liberté. La fonction `chisq.test()` utilise trois catégories, et renvoie donc par défaut :
 
 $$df = 3 - 1 = 2$$
 
@@ -678,9 +675,14 @@ p_value_two_child <- stats::pchisq(
 p_value_two_child
 ```
 
-La conclusion reste la même : on rejette l'hypothèse nulle. La distribution du nombre de garçons dans les familles de deux enfants ne correspond pas à celle attendue sous une loi binomiale simple.
+Ici, on utilise la fonction `pchisq()` du package `stats`, avec les arguments suivants :
+- `test_two_child$statistic` : c'est la valeur du $\chi^2$, calculée automatiquement par la fonction `chisq.test()` comme la statistique de notre test. Contrairement au nombre de degrés de libertés, cette valeur n'est pas affectée par le fait que nous ayons estimé un paramètre à partir des données. La valeur du $\chi^2$ renvoyée par le test est donc correcte et c'est celle que nous utilisons ici ;
+- `df = 1` : le nombre de degrés de liberté correct que nous venons de calculer manuellement ;
+- `lower.tail = FALSE` : il est nécessaire de renseigner cet argument, sinon, au lieu d'obtenir la *p*-value, on obtiendrait 1 - *p*-value.
 
-Cela signifie qu'au moins une des hypothèses du modèle binomial n'est probablement pas vérifiée. La probabilité d'avoir un garçon peut varier d'une famille à l'autre, les sexes des enfants d'une même famille peuvent ne pas être strictement indépendants, ou l'échantillon de familles de deux enfants peut être influencé par des décisions familiales d'arrêt ou de poursuite de la reproduction. Par exemple, certaines familles ayant deux enfants du même sexe peuvent décider d'avoir un troisième enfant, ce qui les retire alors de l'ensemble des familles de deux enfants.
+Ici, la *p*-value correcte est donc bien calculée pour un test du $\chi^2$ avec 1 degré de liberté. Sa valeur a changé, mais la conclusion reste la même : on rejette l'hypothèse nulle. La distribution du nombre de garçons dans les familles de deux enfants ne correspond pas à celle attendue sous une loi binomiale simple.
+
+Cela signifie qu'au moins une des hypothèses du modèle binomial n'est probablement pas vérifiée. La probabilité d'avoir un garçon peut varier d'une famille à l'autre, les sexes des enfants d'une même famille peuvent ne pas être strictement indépendants (par exemple si avoir un garçon en premier enfant influence la probabilité d'avoir un autre garçon), ou la probabilité d'avoir un garçon peut ne pas être constante dans le temps. Ici, une explication plus raisonnable est d'ordre sociologique. L'échantillon de familles de deux enfants peut être influencé par des décisions familiales d'arrêt ou de poursuite de la reproduction. Par exemple, certaines familles ayant deux enfants du même sexe peuvent décider d'avoir un troisième enfant, dans l'espoir d'avoir au moins un enfant de chaque sexe. Cela exclut donc d'emblée ces familles de l'étude puisqu'elles ont alors trois enfants et plus deux. Pour vérifier si cet effet est réel, on pourrait faire une étude comparable sur les familles de **deux enfants et plus**, en étudiant uniquement le sexe des deux premiers enfants. La procédure statistique serait exactement la même, mais l'échantillon serait plus représentatif de la population générale, et ne serait certainement pas biaisé par des décisions familiales liées au sexe des deux premiers enfants.
 
 :::{.callout-important}
 ## À retenir !
@@ -693,200 +695,323 @@ Dans cet exemple, on ne teste pas une proportion unique. On teste si la distribu
 
 ## Ajustement à une loi de Poisson {#sec-gof-poisson}
 
-Le test de qualité de l'ajustement ne sert pas seulement à comparer des effectifs observés à des proportions théoriques fixées à l'avance. Il permet aussi de tester si des données de comptage suivent une distribution de probabilité particulière.
+Passons maintenant à l'ajustement d'une distribution observée à une loi de Poisson. 
 
-La loi de Poisson est particulièrement importante pour les variables de comptage. Elle peut décrire le nombre d'événements observés dans une unité d'espace ou de temps lorsque :
+D'une façon générale, la loi de Poisson est utilisée pour modéliser le nombre d'événements rares qui se produisent dans un intervalle de temps ou d'espace donné. Elle est souvent utilisée dans les domaines de la biologie, de la médecine et de l'ingénierie pour modéliser des phénomènes accidentels, tels que le nombre de mutations génétiques dans un échantillon d'ADN, le nombre d'accidents de la route dans une ville donnée, ou le nombre d'extinctions dans un intervalle de temps donné par exemple.
+
+La loi de Poisson est particulièrement importante pour les données de comptage, car elle permet de décrire le nombre d'événements observés dans une unité d'espace ou de temps lorsque :
 
 - les événements sont indépendants les uns des autres ;
-- la probabilité d'un événement est constante dans l'espace ou dans le temps ;
-- les événements ne se regroupent pas en paquets.
+- les événements se produisent de manière aléatoire et uniforme dans l'espace ou dans le temps ;
+- la probabilité d'un événement est constante en tout point de l'espace étudié ou à tout instant de la période considérée.
 
-Nous allons utiliser le fichier [`loups.csv`](data/loups.csv), qui contient des données sur le nombre de louveteaux observés dans différentes portées. Les variables disponibles sont :
+Si un phénomène rare suit une distribution de Poisson, cela signifie que le hasard peut expliquer à lui seul la distribution spatiale ou temporelle des données observées, ainsi que la variabilité observée dans les données. À l'inverse, si les données observées ne suivent pas une loi de Poisson, cela suggère que d'autres facteurs, tels que des interactions entre individus, les préférences individuelles, le comportement ou la variabilité des conditions environnementales (et de nombreux autres facteurs), peuvent influencer la distribution des événements.
 
-- `inbreedCoef` : coefficient de consanguinité ;
-- `nPups` : nombre de louveteaux dans la portée.
+La @fig-distributions-spatiales illustre trois possibilités. Si l'on compte les individus dans des quadrats de même surface :
+
+-  Une répartition **aléatoire** (graphique du milieu), avec une même densité attendue partout et des positions indépendantes, conduit à des comptages suivant une loi de Poisson. Dans cette situation, la moyenne du nombre d'observations par quadrats est approximativement égale à la variance du nombre d'observations par quadrats. C'est une caractéristique de la distribution de Poisson.
+- Une répartition **agrégée** (graphique de gauche) produit davantage de quadrats peu occupés ou très occupés. La moyenne du nombre d'observations par quadrats pourra être proche de la situation aléatoire, mais la variabilité entre les quadrats sera bien supérieure, puisque certains contiendront de nombreuses observations alors que d'autres en contiendront très peu.
+- À l'inverse, une répartition **dispersée** (graphique de droite) est plus régulière que la situation aléatoire. On l'observe notamment lorsque les individus ont des comportements de répulsions (quand, par exemple, les individus d'une espèce protègent un territoire, ou quand des humains s'installent dans une salle de cinéma en laissant toujours quelques places vides entre eux). La moyenne du nombre d'observations par quadrats pourra être proche de la situation aléatoire, mais la variabilité entre les quadrats sera plus faible puisque la majorité des quadrats contiendra un nombre d'observations similaire.
 
 ```{r}
-wolves <- read_csv("data/loups.csv", show_col_types = FALSE)
+#| label: fig-distributions-spatiales
+#| echo: false
+#| fig-width: 7
+#| fig-height: 2.5
+#| fig-cap: "Trois distributions spatiales simulées : agrégée, aléatoire et dispersée. Chaque panneau contient 100 individus dans une surface identique."
+#| fig-alt: "Trois facettes montrent des points regroupés en amas, placés au hasard et régulièrement espacés avec une légère variation de position."
 
-wolves
+set.seed(123)
+
+# Distribution agrégée : 20 individus autour de chacun des cinq centres.
+centres <- tibble(
+  x_centre = c(0.2, 0.25, 0.5, 0.75, 0.8),
+  y_centre = c(0.25, 0.75, 0.5, 0.2, 0.75)
+)
+
+agregee <- centres |>
+  uncount(20) |>
+  transmute(
+    x = (x_centre + rnorm(n(), sd = 0.055)) %% 1,
+    y = (y_centre + rnorm(n(), sd = 0.055)) %% 1,
+    distribution = "Agrégée"
+  )
+
+# Distribution aléatoire : positions uniformes et indépendantes.
+aleatoire <- tibble(
+  x = runif(100),
+  y = runif(100),
+  distribution = "Aléatoire"
+)
+
+# Distribution dispersée : grille régulière légèrement perturbée.
+dispersee <- expand_grid(
+  x = seq(0.05, 0.95, by = 0.1),
+  y = seq(0.05, 0.95, by = 0.1)
+) |>
+  mutate(
+    x = x + runif(n(), -0.02, 0.02),
+    y = y + runif(n(), -0.02, 0.02),
+    distribution = "Dispersée"
+  )
+
+bind_rows(agregee, aleatoire, dispersee) |>
+  mutate(
+    distribution = factor(
+      distribution,
+      levels = c("Agrégée", "Aléatoire", "Dispersée")
+    )
+  ) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point(
+    fill = "firebrick2",
+    size = 1.8,
+    alpha = 0.75,
+    color = "grey20",
+    shape = 21
+  ) +
+  facet_wrap(vars(distribution), nrow = 1) +
+  coord_fixed(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) +
+  labs(x = NULL, y = NULL) +
+  theme(
+    panel.grid = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank()
+  )
 ```
 
-Ici, nous allons nous concentrer uniquement sur `nPups`, c'est-à-dire sur le nombre de louveteaux par portée. La question posée est la suivante : la distribution observée du nombre de louveteaux par portée est-elle compatible avec une loi de Poisson ?
+Le même raisonnement s'applique à des intervalles de temps de même durée. Nous allons justement en examiner un exemple avec une étude sur le rythme auquel les extinctions d'espèces se produisent au cours des temps géologiques (@Raup1982).
+
+Le fichier [`Extinctions.csv`](data/Extinctions.csv) contient 76 observations. Sa variable `numberOfExtinctions` indique le nombre de familles d'invertébrés marins disparues dans chacun des 76 intervalles de temps définis dans cette étude.
+
+```{r}
+extinctions <- read_csv(
+  "data/Extinctions.csv",
+  show_col_types = FALSE
+)
+
+extinctions
+```
+
+Les questions posées sont les suivantes : la distribution observée du nombre d'extinctions par intervalle de temps est-elle compatible avec une loi de Poisson, autrement dit les extinctions de familles d'invertébrés se produisent-elles au hasard au fil du temps ? Certaines périodes concentrent-elles davantage d'extinctions que prévu ? Ou à l'inverse, les extinctions ont elles lieu à un rythme plus régulier que ce que l'on s'attend à observer par hasard ?
 
 Les hypothèses sont donc :
 
-- H$_0$ : le nombre de louveteaux par portée suit une loi de Poisson.
-- H$_1$ : le nombre de louveteaux par portée ne suit pas une loi de Poisson.
+- H$_0$ : le nombre d'extinctions par intervalle de temps suit une distribution de Poisson.
+- H$_1$ : le nombre d'extinctions par intervalle de temps ne suit pas une distribution de Poisson.
 
 Commençons par quelques statistiques descriptives :
 
 ```{r}
-wolves |>
+extinctions |>
   summarise(
     n = n(),
-    mean_pups = mean(nPups),
-    var_pups = var(nPups),
-    ratio_var_mean = var(nPups) / mean(nPups)
+    mean_extinctions = mean(numberOfExtinctions),
+    var_extinctions = var(numberOfExtinctions),
+    ratio_var_mean = var(numberOfExtinctions) / mean(numberOfExtinctions)
   )
 ```
 
-Pour une loi de Poisson, la moyenne et la variance sont égales. Le rapport variance / moyenne donne donc une première indication :
+Lorsqu'une variable suit une loi de Poisson, sa moyenne et sa variance sont approximativement égales. Le rapport variance / moyenne donne donc une première indication :
 
 - s'il est proche de 1, la distribution est compatible avec une loi de Poisson ;
 - s'il est nettement supérieur à 1, les données sont plus agrégées que prévu ;
 - s'il est nettement inférieur à 1, les données sont plus régulières que prévu.
 
-Ici, ce rapport est proche de 1, ce qui suggère que la loi de Poisson n'est pas une hypothèse absurde. Mais ce n'est qu'un examen descriptif. Il faut maintenant comparer les effectifs observés et attendus.
+Ici, la moyenne vaut environ 4,21 et la variance 13,72. Le rapport variance / moyenne vaut donc environ 3,26, ce qui suggère une agrégation des extinctions dans le temps. Mais ce n'est qu'un examen descriptif. Il faut maintenant comparer les effectifs observés et attendus.
 
 ```{r}
-pup_counts <- wolves |>
-  count(nPups, name = "observed") |>
-  complete(nPups = 0:max(nPups), fill = list(observed = 0))
+extinction_counts <- extinctions |>
+  count(numberOfExtinctions, name = "observed") |>
+  complete(
+    numberOfExtinctions = 0:max(numberOfExtinctions),
+    fill = list(observed = 0)
+  )
 
-pup_counts
+extinction_counts |>
+  print(n = Inf)
 ```
 
-Pour calculer les effectifs attendus sous une loi de Poisson, nous devons connaître le paramètre de cette loi. Pour une loi de Poisson, ce paramètre est la moyenne, souvent notée $\lambda$. Comme il n'est pas connu, nous allons l'estimer à partir des données :
+La fonction `count()` ne fournit que les nombres d'extinctions présents dans les données. La fonction `complete()` permet d'ajouter les valeurs manquantes :
+
+- `numberOfExtinctions = 0:max(numberOfExtinctions)` indique que nous souhaitons une ligne pour chaque entier entre 0 et le maximum observé ;
+- `fill = list(observed = 0)` attribue un effectif observé de 0 aux lignes ajoutées.
+
+Par exemple, si aucun intervalle de temps ne présente 12 extinctions, `complete()` ajoute une ligne pour cette valeur, avec `observed = 0`. Cela permet de comparer les effectifs observés et attendus même pour les valeurs absentes de l'échantillon, auxquelles la loi de Poisson attribue une probabilité non nulle.
+
+Pour calculer les effectifs attendus sous une loi de Poisson, nous devons connaître le paramètre de cette loi. Pour une loi de Poisson, ce paramètre est la moyenne, souvent notée $\lambda$. Comme il n'est pas connu, nous allons l'estimer à partir des données, ce qui nous fera perdre un degré de liberté, comme dans l'exemple de la distribution binomiale :
 
 ```{r}
-lambda_pups <- mean(wolves$nPups)
+lambda_extinctions <- mean(extinctions$numberOfExtinctions)
 
-lambda_pups
+lambda_extinctions
 ```
 
 Nous pouvons maintenant calculer les probabilités attendues grâce à la fonction `dpois()` :
 
 ```{r}
-pup_fit <- pup_counts |>
+extinction_fit <- extinction_counts |>
   mutate(
-    expected_prob = dpois(nPups, lambda = lambda_pups),
-    expected = nrow(wolves) * expected_prob
+    expected_prob = dpois(numberOfExtinctions, lambda = lambda_extinctions),
+    expected = nrow(extinctions) * expected_prob
   )
 
-pup_fit
+extinction_fit |>
+  print(n = Inf)
 ```
 
-Les effectifs attendus sont faibles pour plusieurs valeurs du nombre de louveteaux. Si l'on utilisait directement toutes les catégories, les conditions d'application du test du $\chi^2$ ne seraient pas bien respectées. Dans ce cas, une solution classique consiste à regrouper des catégories voisines, à condition que ce regroupement ait du sens.
+Les effectifs attendus sont faibles, ou très faibles, pour plusieurs valeurs de nombre d'extinctions. Les conditions d'application du test du $\chi^2$ ne sont donc pas respectées :
 
-Ici, nous allons distinguer les portées petites (`0-2` louveteaux), intermédiaires (`3-4` louveteaux), et grandes (`5+` louveteaux) :
+- Certains effectifs attendus sont inférieurs à 1.
+- Les effectifs attendus sont inférieurs à 5 pour plus de 20% des catégories.
+
+ Dans ce cas, une solution classique consiste à regrouper des catégories voisines, à condition que ces regroupements aient du sens. On ne regroupe donc que des catégories contigües, et on effectue uniquement les regroupements absolument nécessaires pour que les conditions d'application du test soient vérifiées, mais surtout pas plus (car on perdrait alors de l'information).
+
+Ici, nous pouvons par exemple regrouper les catégories `0` et `1`, puis toutes les valeurs supérieures ou égales à `8` extinctions. Au lieu de 21 catégories, nous n'en aurons alors plus que huit : `0 ou 1`, `2`, `3`, `4`, `5`, `6`, `7` et `8 et plus`. Cette manipulation n'est pas triviale dans `R`. Assurez-vous de bien comprendre ce qui est fait ici :
 
 ```{r}
-pup_fit_grouped <- pup_fit |>
+# Fusion de certaines catégories
+extinction_fit_grouped <- extinction_fit |>
   mutate(
     class = case_when(
-      nPups <= 2 ~ "0-2",
-      nPups <= 4 ~ "3-4",
-      nPups >= 5 ~ "5+"
+      numberOfExtinctions <= 1 ~ "0 ou 1",
+      numberOfExtinctions >= 8 ~ "8 et plus",
+      TRUE ~ as.character(numberOfExtinctions)
     )
   ) |>
-  summarise(
-    observed = sum(observed),
-    expected = sum(expected),
-    .by = class
-  ) |>
-  mutate(class = factor(class, levels = c("0-2", "3-4", "5+"))) |>
-  arrange(class)
+  # et calcul des effectifs observes de ces nouvelles catégories
+  summarise(observed = sum(observed), .by = class)
 
-pup_fit_grouped
+extinction_fit_grouped
 ```
 
-La comparaison graphique est souvent la meilleure façon de comprendre le test :
+Maintenant que les catégories sont fusionnées, nous devons calculer la probabilité de chacune d'elles sous la loi de Poisson. Pour les deux catégories extrêmes, il faut additionner plusieurs probabilités :
+
+1. Pour la classe `0 ou 1`, nous cherchons $P(X \leq 1)$, soit $P(X = 0) + P(X = 1)$.
+2. Pour la classe `8 et plus`, nous cherchons $P(X \geq 8)$, soit $P(X = 8) + P(X = 9) + P(X = 10) + \cdots$, en poursuivant la somme jusqu'à l'infini. Même si le maximum observé dans les données est de 20 extinctions, ce maximum ne constitue pas une limite pour la loi de Poisson : celle-ci attribue une probabilité non nulle à chacun des nombres d'extinctions supérieurs à 20. Nous devons donc inclure dans cette classe les probabilités de **toutes les valeurs supérieures ou égales à 8**, et pas seulement celles observées dans l'échantillon. Nous garantissons ainsi que les huit classes couvrent toutes les valeurs possibles et que leurs probabilités totalisent 1, comme l'exige le test que nous effectuerons ensuite.
+
+La fonction `dpois()` donne la probabilité d'une valeur précise. Mais pour calculer des sommes de probabilités, nous devons utiliser `ppois()` :
+
+- `ppois(1, lambda = lambda_extinctions, lower.tail = TRUE)` donne $P(X \leq 1)$ ;
+- `ppois(7, lambda = lambda_extinctions, lower.tail = FALSE)` donne $P(X > 7)$, c'est-à-dire $P(X \geq 8)$, donc $P(X = 8) + P(X = 9) + P(X = 10) + \cdots$.
+
+Pour les catégories `2` à `7`, qui correspondent chacune à une seule valeur, nous conservons `dpois()`. Et pour passer des probabilités aux nombres attendus de blocs de temps, on multiplie simplement les probabilités par e nombre total de blocs de temps dans cette étude (76).
+
 
 ```{r}
-pup_fit_grouped |>
+extinction_fit_grouped <- extinction_fit_grouped |>
+  mutate(
+    expected_prob = c(
+      ppois(1, lambda = lambda_extinctions, lower.tail = TRUE),
+      dpois(2:7, lambda = lambda_extinctions),
+      ppois(7, lambda = lambda_extinctions, lower.tail = FALSE)
+    ),
+    expected = nrow(extinctions) * expected_prob
+  )
+
+extinction_fit_grouped
+```
+
+La fonction `ppois()` permet donc d'inclure toutes les valeurs de chaque catégorie extrême : `0` et `1` pour la première, et toutes les valeurs à partir de `8` pour la dernière, même au-delà du maximum observé dans les données. La somme des probabilités attendues vaut bien 1 :
+
+```{r}
+sum(extinction_fit_grouped$expected_prob)
+```
+
+Une seule catégorie sur huit a un effectif attendu inférieur à 5 (environ 4,91 pour `8+`), soit moins de 20% des catégories, et aucun n'est inférieur à 1 : les conditions d'application du test du $\chi^2$ sont donc maintenant respectées.
+
+La comparaison graphique est souvent la meilleure façon de comprendre la structure des données et ses éventuels écarts par rapport à la distribution de Poisson :
+
+```{r}
+extinction_fit_grouped |>
   pivot_longer(
     cols = c(observed, expected),
     names_to = "type",
     values_to = "count"
   ) |>
   ggplot(aes(x = class, y = count, fill = type)) +
-  geom_col(position = "dodge", alpha = 0.75) +
+  geom_col(position = "dodge", alpha = 0.75, color = "grey30") +
   labs(
-    x = "Nombre de louveteaux",
-    y = "Nombre de portées",
+    x = "Nombre d'extinctions",
+    y = "Nombre d'intervalles de temps",
     fill = "",
-    title = "Distribution observée et attendue du nombre de louveteaux"
-  )
+    title = "Distribution observée et attendue du nombre d'extinctions"
+  ) |>
+    scale_fill_viridis_d()
 ```
 
-Les écarts entre effectifs observés et attendus semblent faibles. On peut maintenant réaliser le test. Comme nous avons estimé $\lambda$ à partir des données, nous perdons un degré de liberté. La fonction `chisq.test()` ne le sait pas. Elle calcule donc une p-value avec un nombre de degrés de liberté trop grand. Nous allons utiliser la statistique du $\chi^2$ renvoyée par le test, puis recalculer nous-mêmes la p-value avec le bon nombre de degrés de liberté.
+On observe notamment un excès d'intervalles avec très peu d'extinctions (zéro, une, deux ou trois) et d'intervalles avec au moins huit extinctions, ainsi qu'un déficit pour plusieurs valeurs intermédiaires (entre quatre et sept extinctions). Contrairement aux prédictions de la loi de Poisson, les données semblent donc montrer que le nombre d'extinctions est soit très faible, soit très élevé, mais rarement intermédiaire. 
+
+On peut maintenant réaliser le test. Comme nous avons estimé $\lambda$ à partir des données, nous perdons un degré de liberté. La fonction `chisq.test()` ne le sait pas. Elle calcule donc une *p*-value avec un nombre de degrés de liberté trop grand. Nous allons utiliser la statistique du $\chi^2$ renvoyée par le test, puis recalculer nous-mêmes la *p*-value avec le bon nombre de degrés de liberté, comme nous l'avons fait dans la @sec-gof-binomial pour la loi binomiale :
 
 ```{r}
-test_pups <- stats::chisq.test(
-  x = pup_fit_grouped$observed,
-  p = pup_fit_grouped$expected / sum(pup_fit_grouped$expected)
+test_extinctions <- stats::chisq.test(
+  x = extinction_fit_grouped$observed,
+  p = extinction_fit_grouped$expected / sum(extinction_fit_grouped$expected)
 )
 
-test_pups
+test_extinctions
 ```
+
+`R` affiche ici un avertissement, car `chisq.test()` signale tout effectif attendu inférieur à 5. 
 
 Le nombre correct de degrés de liberté est :
 
 $$df = k - 1 - m$$
 
-où $k$ est le nombre de catégories après regroupement et $m$ le nombre de paramètres estimés à partir des données. Ici, $k = 3$ et $m = 1$, car nous avons estimé $\lambda$. On obtient donc :
+où $k$ est le nombre de catégories après regroupement et $m$ le nombre de paramètres estimés à partir des données. Ici, $k = 8$ et $m = 1$, car nous avons estimé $\lambda$ à partir des données observées. On obtient donc :
 
 ```{r}
-df_pups <- nrow(pup_fit_grouped) - 1 - 1
+df_extinctions <- nrow(extinction_fit_grouped) - 1 - 1
 
-df_pups
+df_extinctions
 ```
 
-La p-value correcte est alors :
+La *p*-value correcte est alors :
 
 ```{r}
-chi2_pups <- sum(
-  (pup_fit_grouped$observed - pup_fit_grouped$expected)^2 /
-    pup_fit_grouped$expected
+pchisq(
+  test_extinctions$statistic,
+  df = df_extinctions,
+  lower.tail = FALSE
 )
-
-1 - pchisq(chi2_pups, df = df_pups)
 ```
 
-Ici, la p-value est grande. On ne rejette donc pas l'hypothèse nulle. La distribution du nombre de louveteaux par portée n'est pas significativement différente de celle attendue sous une loi de Poisson.
+On obtient une statistique du $\chi^2$ d'environ 23,95, avec 6 degrés de liberté, et une *p*-value d'environ 0,00053. On rejette donc l'hypothèse nulle : la distribution du nombre d'extinctions par intervalle de temps n'est pas compatible avec la loi de Poisson ajustée.
 
-Cette conclusion doit toutefois rester prudente. L'échantillon ne contient que `r nrow(wolves)` portées, ce qui limite fortement la puissance du test. Ne pas rejeter H$_0$ ne signifie donc pas que la loi de Poisson est vraie. Cela signifie seulement que, avec ces données, nous n'avons pas de preuve claire d'un écart à cette loi.
+La variance observée est nettement supérieure à la moyenne (voir plus haut), ce qui est cohérent avec une distribution agrégée. De même, les écarts entre effectifs observés et attendus (tableau et graphique ci-dessus) vont dans le même sens. Les données et les résultats du test indiquent une agrégation temporelle des extinctions, cohérente avec l'existence de périodes d'extinctions massives. Le rejet de l'hypothèse nulle et cette conclusion ne permettent toutefois pas d'identifier les causes de ces extinctions de masse.
 
 
-:::{#imp-gof-df .callout-important}
+:::{.callout-important}
 ## Estimation des paramètres et degrés de liberté
-
-Quand les probabilités attendues sont entièrement fixées par l'hypothèse nulle, le nombre de degrés de liberté vaut :
-
-$$df = k - 1$$
-
-où $k$ est le nombre de catégories.
-
-Quand un ou plusieurs paramètres sont estimés à partir des données, il faut retirer un degré de liberté supplémentaire pour chaque paramètre estimé :
+Quand on calcule les effectifs attendus, si un ou plusieurs paramètres sont estimés à partir des données, il faut retirer un degré de liberté supplémentaire pour chaque paramètre estimé :
 
 $$df = k - 1 - m$$
 
-Cette correction est indispensable pour obtenir la bonne p-value.
+où $k$ est le nombre de catégories, et $m$ le nombre de paramètres estimés à partir des données. Cette correction est indispensable pour obtenir la bonne *p*-value.
 :::
 
 
 ## Comment choisir et interpréter un test de qualité de l'ajustement ?
 
-On peut résumer les cas les plus fréquents de la façon suivante :
+Le choix dépend de la question posée et du modèle auquel nous souhaitons comparer les données :
 
-- **une distribution catégorielle** à comparer à des proportions fixées à l'avance :
-  `chisq.test(x, p = ...)`
-- **deux catégories seulement**, avec une proportion à comparer à une valeur théorique :
-  `binom.test()`, ou `chisq.test()` si les effectifs sont grands
-- **une variable de comptage** à comparer à une loi de Poisson :
-  calcul des probabilités attendues avec `dpois()`, puis test du $\chi^2$
-- **une distribution de nombres de succès** à comparer à une loi binomiale :
-  calcul des probabilités attendues avec `dbinom()`, puis test du $\chi^2$
+- **Comparer les effectifs de plusieurs catégories à des proportions théoriques fixées à l'avance** : utiliser `chisq.test(x, p = ...)`, si les effectifs attendus permettent l'approximation du $\chi^2$.
+- **Comparer une proportion à une valeur théorique, avec deux catégories seulement** : utiliser `binom.test()`. Ce test exact convient aussi aux petits échantillons. Le test du $\chi^2$ constitue une autre possibilité lorsque les effectifs attendus sont suffisamment grands.
+- **Comparer une distribution de nombres de succès à une loi binomiale** : calculer les probabilités attendues avec `dbinom()` et, si nécessaire, `pbinom()`, puis réaliser un test du $\chi^2$. Il s'agit ici de comparer une distribution entière au modèle binomial, comme dans l'exemple du nombre de garçons par famille.
+- **Comparer une distribution de comptages à une loi de Poisson** : calculer les probabilités attendues avec `dpois()` et, pour les catégories regroupées, `ppois()`, puis réaliser un test du $\chi^2$.
 
-Dans tous les cas, il faut examiner les données avant le test. En particulier :
+Le test exact de Fisher (`fisher.test()`) répond à une autre question : il permet de tester l'association entre deux variables catégorielles dans un tableau de contingence, notamment lorsque les effectifs sont faibles. Il ne constitue pas une solution de remplacement au test de qualité de l'ajustement présenté ici.
 
-1. les catégories doivent avoir un sens biologique ou expérimental ;
-2. les effectifs attendus doivent être suffisamment grands ;
-3. les regroupements éventuels doivent être décidés de façon raisonnable ;
-4. les paramètres estimés à partir des données doivent être pris en compte dans les degrés de liberté ;
-5. l'interprétation doit porter sur le modèle testé, et pas sur une idée vague de "bonne" ou "mauvaise" distribution.
+Avant de réaliser le test, plusieurs points doivent être vérifiés :
 
+1. les observations doivent être indépendantes ;
+2. les catégories doivent être mutuellement exclusives et couvrir toutes les valeurs possibles sous le modèle testé ;
+3. pour utiliser l'approximation du $\chi^2$, les effectifs **attendus** doivent respecter les conditions présentées dans ce chapitre ; cette contrainte ne s'applique pas au test binomial exact ;
+4. les regroupements éventuels doivent être justifiés et ne doivent pas être choisis pour obtenir une conclusion particulière ;
+5. pour les ajustements étudiés ici, chaque paramètre estimé à partir des données retire un degré de liberté au test du $\chi^2$.
+
+Enfin, rejeter H$_0$ indique un écart entre les données et le modèle testé, sans en identifier automatiquement la cause. Ne pas rejeter H$_0$ signifie que les données ne mettent pas en évidence d'écart significatif. Cela signifie que les données sont compatibles avec l'hypothèse nulle, cela ne prouve pas que le modèle est vrai dans l'absolu.
 
 :::{.callout-warning}
 ## Attention
@@ -908,17 +1033,88 @@ La nouveauté de ce chapitre est que le modèle nul peut maintenant porter sur u
 - distribution de Poisson ;
 - plus généralement, toute distribution pour laquelle on peut calculer des probabilités attendues.
 
-Comme toujours, le test ne suffit pas. Il faut aussi examiner les effectifs observés, les effectifs attendus, les contributions au $\chi^2$, les conditions d'application, et la magnitude des écarts observés.
+Comme toujours, le test ne suffit pas. Il faut aussi examiner les effectifs observés, les effectifs attendus, les contributions au $\chi^2$, les conditions d'application, et la magnitude des écarts observés pour être en mesure de discuter pertinemment des résultats des tests.
 
 
 ## Exercices d'application
 
-1. À partir du jeu de données `poissons_recifaux_lune.csv`, testez si les dates de fertilisation estimées sont réparties de façon égale entre les quatre phases lunaires. Comparez ce test avec le modèle proportionnel au nombre de jours de chaque phase lunaire présenté dans ce chapitre.
+1. Un étudiant propose de tester la répartition des dates de fertilisation estimées entre les quatre phases lunaires avec `chisq.test(observed)`, sans préciser l'argument `p`. Quelles proportions attendues cette commande utilise-t-elle ? Réalisez ce test et comparez les effectifs attendus, la statistique du $\chi^2$ et la *p*-value à ceux du modèle présenté dans le chapitre. Expliquez pourquoi le modèle décrit dans le cours tient mieux compte des occasions de fertilisation disponibles. Si les deux tests conduisent à la même conclusion, cela suffit-il à justifier le choix de proportions égales ?
 
 2. À partir du jeu de données `poissons_recifaux_lune.csv`, regroupez les jours lunaires en deux périodes seulement : du jour 0 au jour 14, puis du jour 15 au jour 29. Les dates de fertilisation estimées sont-elles réparties proportionnellement au nombre de jours de ces deux périodes ?
 
-3. Reprenez le jeu de données `loups.csv`. Réalisez le test d'ajustement à une loi de Poisson sans regrouper les catégories. Examinez les effectifs attendus. Pourquoi ce test n'est-il pas satisfaisant ?
+3. Les résultats d'un croisement correspondent-ils aux prédictions mendéliennes ?
 
-4. Toujours avec `loups.csv`, proposez un autre regroupement des nombres de louveteaux. Recalculez le test et comparez la conclusion à celle du chapitre.
+   @Mendel1866 a étudié simultanément la forme et la couleur des graines de pois. Après autofécondation de plants doubles hétérozygotes, il a obtenu les résultats suivants :
 
-5. À partir du jeu de données `HornedLizards.csv`, testez si les lézards vivants et tués par prédation sont également fréquents dans l'échantillon. Comparez les résultats de `chisq.test()` et `binom.test()`.
+   | Phénotype des graines | Effectif observé |
+   |:----------------------|-----------------:|
+   | Rondes et jaunes      | 315 |
+   | Rondes et vertes      | 108 |
+   | Ridées et jaunes      | 101 |
+   | Ridées et vertes      | 32 |
+
+   Si les deux gènes se transmettent indépendamment et si les allèles responsables des caractères « rond » et « jaune » sont complètement dominants, les proportions attendues sont respectivement $9/16$, $3/16$, $3/16$ et $1/16$.
+
+   Construisez un tableau contenant ces données, puis mettez en œuvre toute la démarche permettant de tester leur compatibilité avec ce modèle : hypothèses, effectifs attendus, vérification des conditions, représentation graphique, test et conclusion biologique. Justifiez le nombre de degrés de liberté utilisé.
+
+   Une absence de différence significative permet-elle d'affirmer que les deux gènes se transmettent indépendamment ? Expliquez.
+
+4. Les cellules de levure sont-elles réparties au hasard ?
+
+   Pour étudier la précision des comptages au microscope, @Student1907 a compté les cellules de levure dans 400 cases de même surface d'une chambre de comptage. Voici les résultats de l'échantillon A, également disponibles dans le jeu de données `HistData::Yeast` :
+
+   | Nombre de cellules dans une case | Nombre de cases |
+   |---------------------------------:|----------------:|
+   | 0 | 213 |
+   | 1 | 128 |
+   | 2 | 37 |
+   | 3 | 18 |
+   | 4 | 3 |
+   | 5 | 1 |
+
+   On veut savoir si les cellules se répartissent au hasard et de façon indépendante sur toute la surface examinée.
+
+   À quelle distribution statistique faut-il comparer les données pour tester ce modèle ? Mettez en œuvre toute la démarche permettant de répondre à cette question.
+
+   Attention : chaque ligne du tableau représente une catégorie de comptage, et non une case observée. Vous devrez donc probablement reconstituer les données brutes (avec `rep()` par exemple) pour reproduire la démarche décrite dans ce chapitre. Ainsi, vous devrez tenir compte des effectifs pour estimer le nombre moyen de cellules par case. Calculez les effectifs attendus et proposez, si nécessaire, un regroupement justifié.
+
+   Faites un graphique comparant les effectifs observés et attendus et interprétez ce graphique ainsi que les résultats du test. En vous appuyant sur les écarts observés, discutez également les conséquences possibles pour la précision d'une estimation de concentration fondée sur quelques cases seulement.
+
+5. Les génotypes des ours de Kermode suivent-ils les proportions de Hardy-Weinberg ?
+
+   Chez certains ours noirs de Colombie-Britannique, un variant récessif du gène *MC1R* est associé à un pelage blanc [@Ritland2001]. Nous noterons ici les deux allèles $B$ et $b$ : les individus $BB$ et $Bb$ ont un pelage sombre, tandis que les individus $bb$ ont un pelage blanc.
+
+   Le jeu de données pédagogique issu de cette étude contient les effectifs suivants :
+
+   | Génotype | Effectif observé |
+   |:---------|-----------------:|
+   | $BB$ | 42 |
+   | $Bb$ | 24 |
+   | $bb$ | 21 |
+
+   Sous le modèle de Hardy-Weinberg, les proportions attendues sont $p^2$, $2p(1-p)$ et $(1-p)^2$, où $p$ est la fréquence de l'allèle $B$. Cette fréquence n'est pas connue et doit être estimée à partir des données.
+
+   Estimez $p$ en comptant les copies de l'allèle $B$, puis testez la compatibilité des effectifs observés avec ce modèle. Présentez les hypothèses, les effectifs attendus, la vérification des conditions, un graphique, le test et une conclusion biologique. Justifiez notamment le nombre de degrés de liberté.
+
+   Quelle catégorie contribue le plus à l'écart au modèle ? Un écart significatif permet-il de conclure que les ours choisissent leur partenaire en fonction de sa couleur ? Discutez notamment l'effet possible d'un regroupement d'individus provenant de populations dont les fréquences alléliques diffèrent.
+
+6. Une plante parasite peut-elle localiser son hôte grâce à son odeur ?
+
+   La cuscute (*Cuscuta pentagona*) est une plante parasite qui doit rapidement trouver une plante hôte après sa germination. Runyon et ses collaborateurs (2006) ont étudié le rôle des composés volatils émis par les plantes dans cette recherche.
+
+   Dans l'une de leurs expériences, des plantules sont exposées à une source de composés volatils extraits de plants de tomate. La direction finale de leur croissance est classée dans quatre secteurs angulaires de même taille :
+
+   | Direction par rapport à la source | Nombre de plantules |
+   |:----------------------------------|--------------------:|
+   | Vers la source                    | 17 |
+   | À gauche                          | 7 |
+   | À droite                          | 4 |
+   | À l'opposé de la source            | 2 |
+
+   Les directions de croissance sont-elles compatibles avec une absence de préférence directionnelle ? Construisez un tableau contenant les données et mettez en œuvre toute la démarche : formulation des hypothèses, choix des probabilités théoriques, calcul des effectifs attendus, vérification des conditions, représentation graphique, test et conclusion biologique.
+
+   Un rejet de l'hypothèse nulle suffit-il, à lui seul, à montrer une attraction vers la source ? Appuyez-vous sur les écarts entre effectifs observés et attendus pour préciser l'interprétation.
+
+   Supposons maintenant que la question posée avant l'expérience soit plus ciblée : les plantules poussent-elles vers la source plus souvent que prévu en l'absence de préférence ? Regroupez les observations en deux catégories, « vers la source » et « autres directions ». Quelle est la probabilité théorique de la première catégorie ? Réalisez un test binomial exact unilatéral et comparez sa conclusion à celle du test précédent. Expliquez pourquoi les deux tests ne répondent pas exactement à la même question.
+
+   Enfin, proposez un dispositif témoin permettant de vérifier que l'orientation observée est liée aux composés volatils, plutôt qu'à une autre caractéristique du dispositif expérimental.
