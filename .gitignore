@@ -11,6 +11,7 @@ Corrections/
 /cache/
 /figure/
 *_files/
+!docs/*_files/
 *.aux
 *.log
 *.toc
